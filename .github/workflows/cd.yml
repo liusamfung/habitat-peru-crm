@@ -1,0 +1,50 @@
+name: CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy-portfolio:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install --global @salesforce/cli
+
+      - name: Write JWT key file
+        env:
+          SF_PORTFOLIO_JWT_KEY: ${{ secrets.SF_PORTFOLIO_JWT_KEY }}
+        run: echo "$SF_PORTFOLIO_JWT_KEY" > server.key
+
+      - name: Authenticate to Portfolio org via JWT
+        env:
+          SF_PORTFOLIO_CONSUMER_KEY: ${{ secrets.SF_PORTFOLIO_CONSUMER_KEY }}
+          SF_PORTFOLIO_USERNAME: ${{ secrets.SF_PORTFOLIO_USERNAME }}
+        run: |
+          sf org login jwt \
+            --client-id "$SF_PORTFOLIO_CONSUMER_KEY" \
+            --jwt-key-file server.key \
+            --username "$SF_PORTFOLIO_USERNAME" \
+            --alias portfolio \
+            --set-default
+
+      - name: Deploy force-app to Portfolio org
+        run: sf project deploy start --source-dir force-app --target-org portfolio
+
+      - name: Run Apex tests (RunLocalTests)
+        run: |
+          sf apex run test \
+            --target-org portfolio \
+            --test-level RunLocalTests \
+            --code-coverage \
+            --result-format human \
+            --wait 30 \
+            --synchronous
+
+      - name: Remove JWT key file
+        if: always()
+        run: rm -f server.key

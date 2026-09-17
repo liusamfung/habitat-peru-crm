@@ -1,0 +1,64 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  scratch-org-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Salesforce CLI
+        run: npm install --global @salesforce/cli
+
+      - name: Write JWT key file
+        env:
+          SF_JWT_KEY: ${{ secrets.SF_JWT_KEY }}
+        run: echo "$SF_JWT_KEY" > server.key
+
+      - name: Authenticate Dev Hub via JWT
+        env:
+          SF_CONSUMER_KEY: ${{ secrets.SF_CONSUMER_KEY }}
+          SF_DEVHUB_USERNAME: ${{ secrets.SF_DEVHUB_USERNAME }}
+        run: |
+          sf org login jwt \
+            --client-id "$SF_CONSUMER_KEY" \
+            --jwt-key-file server.key \
+            --username "$SF_DEVHUB_USERNAME" \
+            --alias devhub \
+            --set-default-dev-hub
+
+      - name: Create scratch org
+        run: |
+          sf org create scratch \
+            --target-dev-hub devhub \
+            --definition-file config/project-scratch-def.json \
+            --alias ci-scratch \
+            --duration-days 1 \
+            --set-default \
+            --wait 10
+
+      - name: Deploy force-app to scratch org
+        run: sf project deploy start --source-dir force-app --target-org ci-scratch
+
+      - name: Run Apex tests (RunLocalTests)
+        run: |
+          sf apex run test \
+            --target-org ci-scratch \
+            --test-level RunLocalTests \
+            --code-coverage \
+            --result-format human \
+            --wait 30 \
+            --synchronous
+
+      - name: Delete scratch org
+        if: always()
+        run: sf org delete scratch --target-org ci-scratch --no-prompt
+
+      - name: Remove JWT key file
+        if: always()
+        run: rm -f server.key
