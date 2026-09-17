@@ -8,6 +8,10 @@ on:
 jobs:
   deploy-portfolio:
     runs-on: ubuntu-latest
+    # See ci.yml: GitHub's Linux runners have no OS keychain, and the
+    # Salesforce CLI needs this to store/read credentials reliably there.
+    env:
+      SF_USE_GENERIC_UNIX_KEYCHAIN: "true"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

@@ -8,6 +8,13 @@ on:
 jobs:
   scratch-org-tests:
     runs-on: ubuntu-latest
+    # GitHub's Linux runners have no OS keychain/keyring service. Without this,
+    # the Salesforce CLI's native keychain lookup fails silently after a
+    # successful OAuth exchange and surfaces as a misleading
+    # RefreshTokenAuthError, even though Salesforce's LoginHistory shows the
+    # login as Success. https://github.com/forcedotcom/cli/issues/2922
+    env:
+      SF_USE_GENERIC_UNIX_KEYCHAIN: "true"
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
