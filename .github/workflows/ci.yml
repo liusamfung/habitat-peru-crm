@@ -15,22 +15,28 @@ jobs:
       - name: Install Salesforce CLI
         run: npm install --global @salesforce/cli
 
-      - name: Write JWT key file
+      # Workaround for Salesforce CLI bug C-1016: `sf org create scratch` fails
+      # when the Dev Hub is authenticated via an External Client App (JWT
+      # Bearer Flow), because scratch org signup can't replicate that app type
+      # into the new org. Classic Connected App creation is disabled on this
+      # Dev Hub (Spring '26), so JWT isn't available here — we authenticate
+      # with a stored SFDX auth URL (refresh token) instead.
+      # https://github.com/forcedotcom/cli/issues/3515
+      - name: Write Dev Hub auth URL file
         env:
-          SF_JWT_KEY: ${{ secrets.SF_JWT_KEY }}
-        run: echo "$SF_JWT_KEY" > server.key
+          SF_DEVHUB_SFDX_AUTH_URL: ${{ secrets.SF_DEVHUB_SFDX_AUTH_URL }}
+        run: echo "$SF_DEVHUB_SFDX_AUTH_URL" > devhub_auth_url.txt
 
-      - name: Authenticate Dev Hub via JWT
-        env:
-          SF_CONSUMER_KEY: ${{ secrets.SF_CONSUMER_KEY }}
-          SF_DEVHUB_USERNAME: ${{ secrets.SF_DEVHUB_USERNAME }}
+      - name: Authenticate Dev Hub via SFDX auth URL
         run: |
-          sf org login jwt \
-            --client-id "$SF_CONSUMER_KEY" \
-            --jwt-key-file server.key \
-            --username "$SF_DEVHUB_USERNAME" \
+          sf org login sfdx-url \
+            --sfdx-url-file devhub_auth_url.txt \
             --alias devhub \
             --set-default-dev-hub
+
+      - name: Remove Dev Hub auth URL file
+        if: always()
+        run: rm -f devhub_auth_url.txt
 
       - name: Create scratch org
         run: |
@@ -58,7 +64,3 @@ jobs:
       - name: Delete scratch org
         if: always()
         run: sf org delete scratch --target-org ci-scratch --no-prompt
-
-      - name: Remove JWT key file
-        if: always()
-        run: rm -f server.key
