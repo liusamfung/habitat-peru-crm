@@ -82,15 +82,31 @@ la mayoría declarativos (DEC), un subconjunto en Apex/LWC/Integraciones.
 
 ## Convenciones del repo
 
-- **Ramas**: `feature/req-case-05` — tipo/kebab, el ID del requerimiento en minúsculas.
-- **Commits**: **en inglés**, imperativo. Para requerimientos, prefija el ID:
+- **Ramas**: `feature/req-case-05` — tipo/kebab, en inglés.
+- **Commits**: en inglés, imperativo. Para requerimientos, prefija el ID:
   `REQ-CASE-05: add satisfaction survey on case close`.
-  (El BRD proponía commits en español; se decidió inglés para mantener consistencia
-  con el historial existente. Documentación y código de negocio siguen en español.)
 - **Orgs**: Dev Hub (solo presta scratch orgs, nunca recibe deploys) ·
   Scratch orgs (efímeras, una por feature) · Portafolio (acumula lo mergeado a `main`).
-- **API version**: 67.0 · **Idioma de la org y del código de negocio**: español.
+- **API version**: 67.0.
 - `server.key` / `server.crt` están gitignoreados. Nunca commitearlos.
+
+### Idioma — regla estricta
+
+| Ámbito                                                                            | Idioma      |
+| --------------------------------------------------------------------------------- | ----------- |
+| Ramas, commits, PRs                                                               | **Inglés**  |
+| Código: clases, métodos, variables, comentarios                                   | **Inglés**  |
+| **API names** de objetos y campos custom (`SLA_Risk__c`)                          | **Inglés**  |
+| **Labels**, picklist values, plantillas de email — lo que ve el usuario en la org | **Español** |
+| Documentación (`docs/`, `README.md`)                                              | **Español** |
+| **Conversación conmigo**                                                          | **Español** |
+
+La documentación va en español porque es lo que revisará un reclutador
+hispanohablante; el código va en inglés porque es el estándar profesional.
+
+> ⚠️ El BRD nombra campos en español (`Riesgo_SLA__c`, `Reserva_Hotel__c`). **Esa
+> convención está derogada:** el API name va en inglés (`SLA_Risk__c`,
+> `Hotel_Reservation__c`) y el Label en español ("Riesgo SLA", "Reserva de Hotel").
 
 ## Estado actual
 

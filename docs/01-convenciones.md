@@ -52,13 +52,30 @@ El punto 3 es el que realmente importa. Si no puede explicarlo, no está termina
 
 ## Convenciones de código y repo
 
-| Tema        | Convención                                                                                                                                                            |
-| ----------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Rama        | `feature/req-case-05` — tipo/kebab, ID del requerimiento en minúsculas                                                                                                |
-| Commit      | **En inglés**, imperativo, con el ID como prefijo: `REQ-CASE-05: add satisfaction survey on case close`                                                               |
-| API version | 67.0 (`sfdx-project.json`)                                                                                                                                            |
-| Idioma      | **Git en inglés** (ramas y commits). **Español** en documentación, comentarios de código y nombres de campos/objetos de negocio (`Riesgo_SLA__c`, `Reserva_Hotel__c`) |
+| Tema        | Convención                                                                                          |
+| ----------- | --------------------------------------------------------------------------------------------------- |
+| Rama        | `feature/req-case-05` — tipo/kebab, en inglés                                                       |
+| Commit      | En inglés, imperativo, con el ID como prefijo: `REQ-CASE-05: add satisfaction survey on case close` |
+| API version | 67.0 (`sfdx-project.json`)                                                                          |
+| Formato     | Prettier + ESLint vía Husky pre-commit                                                              |
 
-> El BRD original proponía commits en español. Se optó por inglés para mantener la
-> consistencia con el historial ya existente del repo.
-> | Formato | Prettier + ESLint vía Husky pre-commit |
+## Idioma — regla estricta
+
+| Ámbito                                           | Idioma                                             |
+| ------------------------------------------------ | -------------------------------------------------- |
+| Ramas, commits, Pull Requests                    | **Inglés**                                         |
+| Código: clases, métodos, variables, comentarios  | **Inglés**                                         |
+| **API names** de objetos y campos custom         | **Inglés** — `SLA_Risk__c`, `Hotel_Reservation__c` |
+| **Labels**, picklist values, plantillas de email | **Español** — "Riesgo SLA", "Reserva de Hotel"     |
+| Documentación (`docs/`, `README.md`)             | **Español**                                        |
+
+**El porqué de la separación:** la documentación es la cara visible del portafolio
+ante un reclutador hispanohablante, así que va en español. El código va en inglés
+porque es el estándar profesional y es lo que esperaría cualquier equipo. Y el
+requisito no funcional de _"interfaz y comunicaciones en español"_ se cumple con los
+**Labels**, no con los API names — que el usuario final nunca ve.
+
+> ⚠️ **Dos convenciones del BRD original quedaron derogadas:** proponía commits en
+> español (ahora inglés, por consistencia con el historial del repo) y nombraba campos
+> en español — `Riesgo_SLA__c`, `Reserva_Hotel__c`. Cuando un requerimiento mencione
+> un campo con nombre en español, créalo con **API name en inglés y Label en español**.

@@ -18,7 +18,9 @@ un problema durante una estadía activa no admite el mismo SLA que un reclamo po
 > El sistema deberá vincular cada Caso a la Reserva del huésped (fechas, habitación,
 > estado de la estadía).
 
-Objeto base de esta unidad (`Reserva_Hotel__c` según el BRD). Del que dependen
+Objeto base de esta unidad. El BRD lo llama `Reserva_Hotel__c`; según la
+[convención de idioma](../01-convenciones.md#idioma--regla-estricta) créalo con
+**API name `Hotel_Reservation__c`** y **Label "Reserva de Hotel"**. Del que dependen
 [REQ-CH-02](02-canales-omnichannel.md) (WhatsApp vinculado a la Reserva),
 [REQ-HT-02](#req-ht-02--escalar-a-gerencia-durante-estadía-activa) (estadía activa) y
 [REQ-AUTO-01](05-automatizacion.md) (loyalty tier).

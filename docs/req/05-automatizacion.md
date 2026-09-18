@@ -61,8 +61,13 @@ Skills estándar.
 
 **Diseño esperado:** una clase **`Database.Batchable`** programada diariamente vía
 **`Schedulable`**, que recorra los Casos abiertos con Milestones no completados y
-actualice un campo **`Riesgo_SLA__c`** (Alto / Medio / Bajo) según el tiempo restante.
-Test class con `Test.startTest()` / `Test.stopTest()`.
+actualice un campo de riesgo (valores Alto / Medio / Bajo) según el tiempo restante.
+
+> El BRD llama a ese campo `Riesgo_SLA__c`. Según la
+> [convención de idioma](../01-convenciones.md#idioma--regla-estricta), créalo con
+> **API name `SLA_Risk__c`** y **Label "Riesgo SLA"**. Los valores de la picklist sí
+> van en español: los ve el agente.
+> Test class con `Test.startTest()` / `Test.stopTest()`.
 
 > Buen segundo requerimiento de código, después de
 > [REQ-CASE-05](01-gestion-casos.md). Depende de [REQ-SLA-01](03-sla-entitlements.md).
