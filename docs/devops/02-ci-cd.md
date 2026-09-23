@@ -8,20 +8,31 @@
 
 ## CI — en cada Pull Request hacia `main`
 
-**Objetivo:** que ningún código roto llegue a `main`. Crea una scratch org temporal
-_solo para validar_, corre los tests, y la borra sin importar el resultado.
+**Objetivo:** que ningún código roto llegue a `main`. Son **dos jobs encadenados**
+([`ci.yml`](../../.github/workflows/ci.yml)): el segundo declara `needs` sobre el
+primero, así que solo corre si el primero pasa. Un error de formato o una violación de
+seguridad falla en segundos y **nunca gasta una de las 6 creaciones diarias de scratch
+org**.
 
-Pasos de [`ci.yml`](../../.github/workflows/ci.yml):
+### Job 1 — `format-lint-lwc-tests` (sin org)
 
 1. Checkout del código.
-2. Instalar el Salesforce CLI.
-3. Escribir el auth URL del Dev Hub a un archivo temporal desde el secret.
-4. `sf org login sfdx-url` → alias `devhub`, marcado como default Dev Hub.
-5. Borrar el archivo del auth URL (`if: always()`).
-6. `sf org create scratch` → alias `ci-scratch`, 1 día de duración.
-7. `sf project deploy start --source-dir force-app`.
-8. `sf apex run test --test-level RunLocalTests --code-coverage --synchronous`.
-9. `sf org delete scratch` (`if: always()`).
+2. `actions/setup-node` instala Node leyendo `.node-version` y cachea las descargas de npm.
+3. `npm ci` (con `HUSKY=0`, porque los git hooks no sirven en un runner).
+4. Prettier (`prettier:verify`), ESLint (`lint`) y Jest (`test:unit:coverage`).
+5. Instalar el Salesforce CLI y el plugin `code-analyzer`.
+6. **Análisis estático de Apex** (`npm run scan`). Ver
+   [04-calidad-de-codigo.md](04-calidad-de-codigo.md).
+
+### Job 2 — `scratch-org-test` (con org)
+
+1. Instalar el Salesforce CLI y hacer checkout.
+2. Escribir el auth URL del Dev Hub a un archivo, validando que el secret no esté vacío.
+3. `sf org login sfdx-url` → alias `devhub`, marcado como default Dev Hub.
+4. `sf org create scratch` → alias `scratch-org`, 1 día de duración.
+5. `sf project deploy start`.
+6. `sf apex run test -c -r human -w 20`.
+7. `sf org delete scratch` (`if: always()`).
 
 ### Por qué `if: always()` en el borrado
 
