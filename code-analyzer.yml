@@ -1,0 +1,14 @@
+# Salesforce Code Analyzer configuration.
+# https://developer.salesforce.com/docs/platform/salesforce-code-analyzer/guide/config-custom.html
+#
+# Only values that differ from the defaults are set here. Rule selection and the
+# severity threshold live in the `scan` script in package.json, so the local
+# pre-push hook and CI run exactly the same command.
+engines:
+  eslint:
+    # Reuse the project's own eslint.config.js instead of Code Analyzer's built-in
+    # ESLint setup, so `npm run lint` and the scan cannot disagree about a file.
+    auto_discover_eslint_config: true
+    # eslint.config.js already applies the LWC recommended rules; keeping the
+    # built-in LWC base config on would report every LWC violation twice.
+    disable_lwc_base_config: true

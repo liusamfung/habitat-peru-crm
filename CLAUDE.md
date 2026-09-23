@@ -112,5 +112,8 @@ hispanohablante; el código va en inglés porque es el estándar profesional.
 
 - ✅ Scaffold SFDX, ESLint/Jest/Husky/Prettier.
 - ✅ CI/CD funcionando (`.github/workflows/ci.yml`, `cd.yml`).
+- ✅ Análisis estático de Apex (Salesforce Code Analyzer) en pre-push y en CI.
+  `npm run scan` para correrlo a mano; `npm run scan:detail` explica cada violación.
+  Ver [docs/devops/04-calidad-de-codigo.md](docs/devops/04-calidad-de-codigo.md).
 - ⬜ Ningún requerimiento de negocio implementado todavía. La única clase Apex
   (`CicdPipelineCheck`) es un smoke test del pipeline, descartable.

@@ -15,7 +15,8 @@ docs/
 └── devops/                 Flujo de desarrollo end-to-end
     ├── 01-flujo-git-y-orgs.md
     ├── 02-ci-cd.md
-    └── 03-autenticacion-jwt.md
+    ├── 03-autenticacion-jwt.md
+    └── 04-calidad-de-codigo.md   Compuertas pre-commit / pre-push / CI
 ```
 
 ## Por dónde empezar

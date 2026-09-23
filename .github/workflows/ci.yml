@@ -1,73 +1,113 @@
+# Unique name for this workflow
 name: CI
 
+# Definition when the workflow should run
 on:
   pull_request:
     branches:
       - main
 
+# Jobs to be executed
 jobs:
-  scratch-org-tests:
+  format-lint-lwc-tests:
     runs-on: ubuntu-latest
-    # GitHub's Linux runners have no OS keychain/keyring service. Without this,
-    # the Salesforce CLI's native keychain lookup fails silently after a
-    # successful OAuth exchange and surfaces as a misleading
-    # RefreshTokenAuthError, even though Salesforce's LoginHistory shows the
-    # login as Success. https://github.com/forcedotcom/cli/issues/2922
+    steps:
+      # Checkout the source code
+      - name: "Checkout source code"
+        uses: actions/checkout@v7.0.0
+
+      # Install Node, reading .node-version — the same file mise reads locally,
+      # so CI and the developer machine cannot drift apart.
+      # `cache: npm` caches npm's download directory (~/.npm), not node_modules.
+      - name: "Set up Node"
+        uses: actions/setup-node@v7.0.0
+        with:
+          node-version-file: ".node-version"
+          cache: "npm"
+
+      # Install npm dependencies for Prettier and Jest.
+      # Runs unconditionally: since the cache above holds downloads rather than
+      # node_modules, `npm ci` stays fast while still matching the lockfile exactly.
+      - name: "Install npm dependencies"
+        run: HUSKY=0 npm ci
+
+      # Prettier formatting
+      - name: "Code formatting verification with Prettier"
+        run: npm run prettier:verify
+
+      # Lint LWC / Aura
+      - name: "Lint Lightning Web Components / Aura Components"
+        run: npm run lint
+
+      # LWC unit tests
+      - name: "Unit test Lightning Web Components"
+        run: npm run test:unit:coverage
+
+      # Code Analyzer runs on the Salesforce CLI. It needs no org, so it lives in
+      # this job: a violation fails the run in seconds, before a scratch org is
+      # created. Its Java engines run on the JDK 17 preinstalled on ubuntu-latest.
+      - name: "Install Salesforce CLI"
+        run: npm install @salesforce/cli --location=global
+
+      - name: "Install Code Analyzer plugin"
+        run: sf plugins install code-analyzer
+
+      # Runs the same `scan` script as the local pre-push hook (see package.json),
+      # so CI can never fail on something that passed on the developer's machine.
+      - name: "Static analysis of Apex with Code Analyzer"
+        run: npm run scan
+
+  scratch-org-test:
+    runs-on: ubuntu-latest
+    needs: format-lint-lwc-tests
+    # GitHub's Linux runners have no OS keychain service. Without this, the
+    # Salesforce CLI's keychain lookup fails silently after a successful OAuth
+    # exchange and surfaces as a misleading RefreshTokenAuthError.
+    # https://github.com/forcedotcom/cli/issues/2922
     env:
       SF_USE_GENERIC_UNIX_KEYCHAIN: "true"
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # Install Salesforce CLI
+      - name: "Install Salesforce CLI"
+        run: npm install @salesforce/cli --location=global
 
-      - name: Install Salesforce CLI
-        run: npm install --global @salesforce/cli
+      # Checkout the source code
+      - name: "Checkout source code"
+        uses: actions/checkout@v7.0.0
 
-      # Workaround for Salesforce CLI bug C-1016: `sf org create scratch` fails
-      # when the Dev Hub is authenticated via an External Client App (JWT
-      # Bearer Flow), because scratch org signup can't replicate that app type
-      # into the new org. Classic Connected App creation is disabled on this
-      # Dev Hub (Spring '26), so JWT isn't available here — we authenticate
-      # with a stored SFDX auth URL (refresh token) instead.
-      # https://github.com/forcedotcom/cli/issues/3515
-      - name: Write Dev Hub auth URL file
+      # Store secret for dev hub.
+      # Uses an SFDX auth URL instead of JWT because of CLI bug C-1016:
+      # `sf org create scratch` fails when the Dev Hub is authenticated via an
+      # External Client App. https://github.com/forcedotcom/cli/issues/3515
+      - name: "Populate auth file with SF_DEVHUB_SFDX_AUTH_URL secret"
+        shell: bash
         env:
           SF_DEVHUB_SFDX_AUTH_URL: ${{ secrets.SF_DEVHUB_SFDX_AUTH_URL }}
-        run: echo "$SF_DEVHUB_SFDX_AUTH_URL" > devhub_auth_url.txt
-
-      - name: Authenticate Dev Hub via SFDX auth URL
         run: |
-          sf org login sfdx-url \
-            --sfdx-url-file devhub_auth_url.txt \
-            --alias devhub \
-            --set-default-dev-hub
+          echo "$SF_DEVHUB_SFDX_AUTH_URL" > ./DEVHUB_AUTH_URL.txt
+          secretFileSize=$(wc -c "./DEVHUB_AUTH_URL.txt" | awk '{print $1}')
+          if [ $secretFileSize == 1 ]; then
+              echo "Missing SF_DEVHUB_SFDX_AUTH_URL secret. Is this workflow running on a fork?";
+              exit 1;
+          fi
 
-      - name: Remove Dev Hub auth URL file
+      # Authenticate dev hub
+      - name: "Authenticate Dev Hub"
+        run: sf org login sfdx-url -f ./DEVHUB_AUTH_URL.txt -a devhub -d
+
+      # Create scratch org
+      - name: "Create scratch org"
+        run: sf org create scratch -f config/project-scratch-def.json -a scratch-org -d -y 1
+
+      # Deploy source to scratch org
+      - name: "Push source to scratch org"
+        run: sf project deploy start
+
+      # Run Apex tests in scratch org
+      - name: "Run Apex tests"
+        run: sf apex run test -c -r human -w 20
+
+      # Housekeeping
+      - name: "Delete scratch org"
         if: always()
-        run: rm -f devhub_auth_url.txt
-
-      - name: Create scratch org
-        run: |
-          sf org create scratch \
-            --target-dev-hub devhub \
-            --definition-file config/project-scratch-def.json \
-            --alias ci-scratch \
-            --duration-days 1 \
-            --set-default \
-            --wait 10
-
-      - name: Deploy force-app to scratch org
-        run: sf project deploy start --source-dir force-app --target-org ci-scratch
-
-      - name: Run Apex tests (RunLocalTests)
-        run: |
-          sf apex run test \
-            --target-org ci-scratch \
-            --test-level RunLocalTests \
-            --code-coverage \
-            --result-format human \
-            --wait 30 \
-            --synchronous
-
-      - name: Delete scratch org
-        if: always()
-        run: sf org delete scratch --target-org ci-scratch --no-prompt
+        run: sf org delete scratch -p -o scratch-org
