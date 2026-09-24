@@ -26,6 +26,89 @@ Es el requerimiento raíz. Los Record Types que definas aquí determinan Queues,
 Assignment Rules, Entitlement Processes, layouts, picklist values y reportería
 del resto del proyecto.
 
+### Decisiones de diseño (2026-09-23)
+
+**Record Types.** Un solo objeto `Case` con tres Record Types:
+
+| `DeveloperName` | Label (español)  |
+| --------------- | ---------------- |
+| `Real_Estate`   | Inmobiliaria     |
+| `Parking`       | Estacionamientos |
+| `Hospitality`   | Hotelería        |
+
+**`Status`.** Un flujo compartido entre las tres unidades, confirmado el 2026-09-23,
+con seis valores: `New`, `Working`, `Waiting_on_Customer`, `Escalated`, `Resolved` y
+`Closed`. **Solo `Closed` es un estado cerrado**; `Resolved` es **abierto**, para que
+REQ-INT-02 (al resolver) y REQ-CASE-05 (al cerrar) disparen en momentos distintos y no
+se pisen. `Waiting_on_Customer` es el estado en el que REQ-SLA-02 pausa el cronómetro.
+Sin estados propios por unidad hasta que un requerimiento lo exija.
+
+**`Type`.** Tres valores compartidos (`Inquiry`, `Complaint`, `Request`) y dos
+exclusivos de `Real_Estate` (`Warranty_Claim`, `Post_Sale_Follow_Up`).
+
+**`Reason`.** Filtrado solo por Record Type, con unos 3 valores por unidad. Se descarta
+por ahora la dependencia Type→Reason. Agregar valores después es barato. Tres valores
+por unidad, decididos el 2026-09-23:
+
+| Record Type   | Valor guardado         | Traducción al español   |
+| ------------- | ---------------------- | ----------------------- |
+| `Real_Estate` | `Delivery`             | Entrega                 |
+| `Real_Estate` | `Documentation`        | Documentación           |
+| `Real_Estate` | `Construction_Defect`  | Defecto de construcción |
+| `Parking`     | `Lost_Ticket`          | _(por definir)_         |
+| `Parking`     | `Monthly_Subscription` | _(por definir)_         |
+| `Parking`     | `Vehicle_Damage`       | _(por definir)_         |
+| `Hospitality` | `Special_Request`      | _(por definir)_         |
+| `Hospitality` | `Operational_Incident` | _(por definir)_         |
+| `Hospitality` | `Service_Quality`      | Calidad del servicio    |
+
+Las traducciones que faltan se definen al configurar cada valor. La forma final de los
+valores con guion bajo depende de la verificación del API name (ver más abajo).
+
+**Acceso a los Record Types.** Un solo Permission Set, `Case_All_Record_Types`, que da
+acceso a los tres Record Types al administrador y al desarrollo. Se crea en Setup y se
+trae al repo con `retrieve`. No se usa el perfil Admin, porque su archivo es enorme y
+cada `retrieve` lo reescribe con cambios ajenos. Los permission sets por unidad quedan
+para [REQ-SEC-01](10-seguridad.md), junto con la visibilidad de los registros.
+
+**Page layouts.** Un solo page layout compartido por los tres Record Types. La
+asignación de layout a cada Record Type se guarda en el perfil, no en el permission
+set, así que un layout por unidad volvería a meter el perfil (y su ruido) en el repo.
+Se crean layouts por unidad solo cuando un requerimiento lo exija.
+
+**Idioma.** Los valores de picklist se guardan en inglés y el español va como
+traducción vía Translation Workbench (pendiente de verificar). Los labels de los
+Record Types se teclean directo en español. Ver
+[Idioma — regla estricta](../01-convenciones.md#idioma--regla-estricta).
+
+**Decisiones de diseño abiertas: ninguna.** Solo quedan las comprobaciones en la
+scratch org y el trabajo posterior que se indica abajo. Los `Reason` de Parking cubren
+la pérdida de boleta ([REQ-PK-01](07-parking.md)), el abono mensual (REQ-PK-02) y el
+daño vehicular ([REQ-PK-03](07-parking.md)).
+
+**Cuando el permission set ya exista en el repo** (creado, traído con `retrieve` y
+commiteado):
+
+- Añadir `sf org assign permset -n Case_All_Record_Types` a `ci.yml`, **después del
+  deploy y antes de los tests**.
+- Añadirlo también al flujo local de creación de scratch orgs (ver el
+  [flujo por feature](../devops/01-flujo-git-y-orgs.md)).
+
+La asignación es dato y no metadata, así que hay que repetirla en cada scratch org
+nueva.
+
+**Pendiente de verificar en la scratch org** (antes de configurar los `Status`):
+
+1. Que la scratch org traiga por defecto los `Status` `New`, `Working`, `Escalated` y
+   `Closed`. Es lo que devuelve el Dev Hub, pero falta comprobarlo en la scratch org.
+2. Cómo se asigna el _support process_ a los Record Types. El support process es lo que
+   define qué valores de `Status` están disponibles para cada Record Type.
+3. Si un valor de picklist tiene **API name propio** además de su label. Con eso se
+   decide si el guion bajo de `Waiting_on_Customer` va solo en el API name o en todo el
+   valor. El nombre está confirmado; lo que falta decidir es su forma. Esta comprobación
+   se hace junto con la prueba de
+   [Translation Workbench](../01-convenciones.md#translation-workbench-pendiente-de-verificar).
+
 **Preguntas que debes poder responder:**
 
 - ¿Por qué un solo objeto `Case` con tres Record Types en lugar de tres objetos custom?
@@ -93,7 +176,10 @@ testing.
 
 **Diseño esperado:**
 
-- Un Apex Trigger sobre `Case` que detecte el cambio a `Status = 'Closed'`.
+- Un Apex Trigger sobre `Case` que detecte el cambio a `Status = 'Closed'`. Recuerda
+  que `Resolved` es un estado **abierto**: esta encuesta se dispara al cerrar, no al
+  resolver (ver las [decisiones de diseño](#decisiones-de-diseño-2026-09-23) de
+  REQ-CASE-01).
 - El envío encolado en un **Queueable**, con la plantilla de encuesta distinta según
   el Record Type (Inmobiliaria / Parking / Hotelería).
 - Patrón **handler class** (el trigger no contiene lógica).

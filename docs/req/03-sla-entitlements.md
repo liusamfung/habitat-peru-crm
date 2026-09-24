@@ -33,6 +33,12 @@ Cimiento de toda esta área. Habilita Entitlement Management en Setup antes de n
 > El sistema deberá pausar el cronómetro de SLA cuando el estado sea "Esperando al
 > Cliente" y reanudarlo al recibir respuesta.
 
+"Esperando al Cliente" es el nombre visible. Su valor guardado en inglés es
+`Waiting_on_Customer` (confirmado el 2026-09-23). Falta verificar en la scratch org si
+el guion bajo va solo en el API name o en todo el valor; ver las
+[decisiones de REQ-CASE-01](01-gestion-casos.md#decisiones-de-diseño-2026-09-23) y los
+[valores de `Status`](README.md#valores-de-status-mencionados-en-el-tablero).
+
 Funcionalidad estándar: _Stopped / Stopped Since_ en el Entitlement Process. Ojo con
 cómo afecta al cálculo del tiempo restante del milestone.
 

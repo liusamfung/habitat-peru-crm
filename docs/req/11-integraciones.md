@@ -41,9 +41,14 @@ Compárala con [REQ-PK-01](07-parking.md), que tiene ambas direcciones.
 > El sistema deberá publicar un Platform Event cuando un Caso pase a "Resuelto" para
 > un sistema externo de garantías/facturación.
 
+"Resuelto" es el nombre que ve el usuario; el **valor guardado** de `Status` es
+`Resolved`, y es el que compara el código. Es un estado **abierto** (el cerrado es
+`Closed`, que dispara [REQ-CASE-05](01-gestion-casos.md)), de modo que ambos
+requerimientos reaccionan en momentos distintos.
+
 **Diseño esperado:** un Platform Event **`Case_Resolved__e`** y un Apex Trigger en
-`Case` que lo publique cuando el Estado cambie a "Resuelto", incluyendo **Record Type
-y fecha de resolución** como campos del evento.
+`Case` que lo publique cuando el Estado cambie a "Resuelto" (`Resolved`), incluyendo
+**Record Type y fecha de resolución** como campos del evento.
 
 > Buen requerimiento de dificultad media una vez que [REQ-CASE-05](01-gestion-casos.md)
 > esté hecho: reutiliza el mismo patrón de trigger + handler, pero con publicación de

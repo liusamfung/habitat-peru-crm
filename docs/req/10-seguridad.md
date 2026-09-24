@@ -18,16 +18,25 @@
 > El sistema deberá configurar el OWD de Case como Privado, con visibilidad vía Case
 > Team y jerarquía acotada por unidad.
 
-**Pasos de Setup:** configura el OWD de Case en Privado (Setup → Sharing Settings),
-crea Case Team Roles, y usa **"Grant Access Using Hierarchies"** para limitar cuánto
-sube la visibilidad por jerarquía de roles.
+**Pasos de Setup:** configura el OWD de Case en Privado (Setup → Sharing Settings) y
+crea los Case Team Roles. La visibilidad por jerarquía de roles se acota con la forma
+de la jerarquía, no con una casilla (ver la corrección de abajo).
+
+> ⚠️ **Corrección al BRD.** El BRD indica usar **"Grant Access Using Hierarchies"** para
+> limitar cuánto sube la visibilidad. En Case esa casilla **no se puede desmarcar**:
+> Samuel lo comprobó en su org el 2026-09-23 (queda marcada y bloqueada aunque el OWD
+> sea Private). La jerarquía de roles siempre da acceso hacia arriba, así que lo de
+> "jerarquía acotada por unidad" se logra con la **forma de la jerarquía**: cada unidad
+> de negocio en su propia rama, sin que el rol de un gerente sea ancestro de los roles
+> de otra unidad, y solo el holding en la cima.
 
 **Preguntas que debes poder responder:**
 
 - ¿Orden de evaluación completo: OWD → Role Hierarchy → Sharing Rules → Manual/Apex
   Sharing → Team?
-- ¿Por qué "Grant Access Using Hierarchies" importa en un holding? (pista: sin
-  acotarlo, el gerente de Inmobiliaria termina viendo Casos de Hotelería)
+- ¿Por qué la forma de la jerarquía de roles importa en un holding? (pista: si
+  Inmobiliaria y Hotelería comparten rama, el gerente de una termina viendo los Casos
+  de la otra)
 - ¿Qué implica el OWD Privado para el código Apex? (`with sharing` /
   `without sharing` / `inherited sharing`)
 
