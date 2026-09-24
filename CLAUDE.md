@@ -92,17 +92,25 @@ la mayoría declarativos (DEC), un subconjunto en Apex/LWC/Integraciones.
 
 ### Idioma — regla estricta
 
-| Ámbito                                                                            | Idioma      |
-| --------------------------------------------------------------------------------- | ----------- |
-| Ramas, commits, PRs                                                               | **Inglés**  |
-| Código: clases, métodos, variables, comentarios                                   | **Inglés**  |
-| **API names** de objetos y campos custom (`SLA_Risk__c`)                          | **Inglés**  |
-| **Labels**, picklist values, plantillas de email — lo que ve el usuario en la org | **Español** |
-| Documentación (`docs/`, `README.md`)                                              | **Español** |
-| **Conversación conmigo**                                                          | **Español** |
+| Ámbito                                                              | Idioma                                                                                   |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
+| Ramas, commits, PRs                                                 | **Inglés**                                                                               |
+| Código: clases, métodos, variables, comentarios                     | **Inglés**                                                                               |
+| **API names** de objetos y campos custom (`SLA_Risk__c`)            | **Inglés**                                                                               |
+| **Labels** de objetos, campos y Record Types (se teclean directo)   | **Español**                                                                              |
+| **Valores de picklist** (`Status`, `Type`, `Reason`, campos custom) | **Inglés**, con traducción al español vía Translation Workbench (pendiente de verificar) |
+| Plantillas de email y textos de Flow                                | **Pendiente de decidir**                                                                 |
+| Documentación (`docs/`, `README.md`)                                | **Español**                                                                              |
+| **Conversación conmigo**                                            | **Español**                                                                              |
 
 La documentación va en español porque es lo que revisará un reclutador
 hispanohablante; el código va en inglés porque es el estándar profesional.
+
+La org está en **inglés** (`en_US`). Los valores de picklist se guardan siempre en
+inglés porque el código los compara como string (`Status = 'Closed'`); el español se
+agrega solo como traducción. Un label, en cambio, es texto libre que el código nunca
+referencia (usa API names o `DeveloperName`), así que se teclea directo en español.
+Detalle y motivos en [docs/01-convenciones.md](docs/01-convenciones.md#idioma--regla-estricta).
 
 > ⚠️ El BRD nombra campos en español (`Riesgo_SLA__c`, `Reserva_Hotel__c`). **Esa
 > convención está derogada:** el API name va en inglés (`SLA_Risk__c`,

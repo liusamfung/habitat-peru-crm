@@ -69,6 +69,22 @@
 | REQ-AI-01   | IA                   | Baja  | ⬜     | Agente Agentforce de autoservicio                               |
 | REQ-AI-02   | IA                   | Baja  | ⬜     | Clasificación predictiva de Tipo y Motivo                       |
 
+### Valores de `Status` mencionados en el tablero
+
+El tablero usa los nombres que ve el usuario, en español. Los **valores guardados** de
+`Status` van en inglés, porque el código los compara como string (ver
+[Idioma — regla estricta](../01-convenciones.md#idioma--regla-estricta)):
+
+| Nombre visible       | Valor guardado        | Estado                       |
+| -------------------- | --------------------- | ---------------------------- |
+| Resuelto             | `Resolved`            | Decidido. Estado **abierto** |
+| Cerrado              | `Closed`              | Decidido. Estado **cerrado** |
+| Esperando al Cliente | `Waiting_on_Customer` | Decidido. Estado **abierto** |
+
+El nombre `Waiting_on_Customer` está confirmado. Falta verificar en la scratch org si el
+guion bajo va solo en el API name o en todo el valor (ver las
+[decisiones de REQ-CASE-01](01-gestion-casos.md#decisiones-de-diseño-2026-09-23)).
+
 ## Orden de ataque sugerido
 
 El BRD no impone un orden. Este es el que tiene menos dependencias hacia atrás:
