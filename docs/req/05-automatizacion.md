@@ -66,10 +66,10 @@ restante. Test class con `Test.startTest()` / `Test.stopTest()`.
 
 > El BRD llama a ese campo `Riesgo_SLA__c`. Según la
 > [convención de idioma](../01-convenciones.md#idioma--regla-estricta), créalo con
-> **API name `SLA_Risk__c`** y **Label "Riesgo SLA"**. Los valores de la picklist se
-> guardan en inglés (`High` / `Medium` / `Low`) porque el código los compara como
-> string; el español ("Alto", "Medio", "Bajo") va como traducción vía Translation
-> Workbench, que es lo que ve el agente.
+> **API name `SLA_Risk__c`** y **Label "Riesgo SLA"**. Los valores de la picklist llevan
+> API name en inglés (`High` / `Medium` / `Low`), porque es lo que compara el código;
+> el español ("Alto", "Medio", "Bajo") va como traducción vía Translation Workbench,
+> que es lo que ve el agente.
 
 > Buen segundo requerimiento de código, después de
 > [REQ-CASE-05](01-gestion-casos.md). Depende de [REQ-SLA-01](03-sla-entitlements.md).

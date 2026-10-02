@@ -62,15 +62,15 @@ El punto 3 es el que realmente importa. Si no puede explicarlo, no está termina
 
 ## Idioma — regla estricta
 
-| Ámbito                                                              | Idioma                                                                                   |
-| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Ramas, commits, Pull Requests                                       | **Inglés**                                                                               |
-| Código: clases, métodos, variables, comentarios                     | **Inglés**                                                                               |
-| **API names** de objetos y campos custom                            | **Inglés** — `SLA_Risk__c`, `Hotel_Reservation__c`                                       |
-| **Labels** de objetos, campos y Record Types                        | **Español**, tecleados directo — "Riesgo SLA", "Reserva de Hotel"                        |
-| **Valores de picklist** (`Status`, `Type`, `Reason`, campos custom) | **Inglés**, con traducción al español vía Translation Workbench (pendiente de verificar) |
-| Plantillas de email y textos de Flow                                | **Pendiente de decidir**                                                                 |
-| Documentación (`docs/`, `README.md`)                                | **Español**                                                                              |
+| Ámbito                                                              | Idioma                                                                             |
+| ------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Ramas, commits, Pull Requests                                       | **Inglés**                                                                         |
+| Código: clases, métodos, variables, comentarios                     | **Inglés**                                                                         |
+| **API names** de objetos y campos custom                            | **Inglés** — `SLA_Risk__c`, `Hotel_Reservation__c`                                 |
+| **Labels** de objetos, campos y Record Types                        | **Español**, tecleados directo — "Riesgo SLA", "Reserva de Hotel"                  |
+| **Valores de picklist** (`Status`, `Type`, `Reason`, campos custom) | **Inglés** (API name y label), con traducción al español vía Translation Workbench |
+| Plantillas de email y textos de Flow                                | **Pendiente de decidir**                                                           |
+| Documentación (`docs/`, `README.md`)                                | **Español**                                                                        |
 
 **El porqué de la separación:** la documentación es la cara visible del portafolio
 ante un reclutador hispanohablante, así que va en español. El código va en inglés
@@ -80,22 +80,33 @@ piezas: los **labels** de objetos, campos y Record Types, tecleados directamente
 español, y las **traducciones al español de los valores de picklist**. Los API names,
 que el usuario final nunca ve, quedan en inglés.
 
-**Por qué los valores de picklist no se teclean en español:** el código los compara
-como string (`Status = 'Closed'`). Si el valor guardado fuera `Cerrado`, esa
-comparación dejaría de coincidir. Por eso el valor se guarda siempre en inglés y el
-español se agrega solo como traducción, que cambia lo que ve el usuario sin cambiar lo
-que compara el código. Un label, en cambio, es texto libre que el código nunca
-referencia (usa API names o `DeveloperName`), así que no necesita traducción.
+**Por qué los valores de picklist van en inglés:** Salesforce guarda un valor de
+picklist como su **API name**; el label es solo lo que se muestra. El código compara el
+API name (`Status = 'Closed'`), nunca el label, así que el API name va siempre en
+inglés. En una org `en_US`, el label maestro es el texto en inglés ("Waiting on
+Customer") y el español se agrega como traducción ("Esperando al Cliente") con
+Translation Workbench: cambia lo que ve el usuario sin tocar lo que compara el código,
+y deja el inglés disponible para los huéspedes extranjeros de Hotelería. Un label de
+objeto, campo o Record Type, en cambio, es texto libre que el código nunca referencia
+(usa API names o `DeveloperName`), así que se teclea directo en español.
 
 ### Idioma de la org
 
-La org está en **inglés** (`en_US`). Verificado en la org de Portafolio con
-`SELECT LanguageLocaleKey FROM Organization`. Las scratch orgs usan el idioma por
-defecto, porque `config/project-scratch-def.json` no define la clave `language`; eso
-se confirmará con la primera scratch org real. La idea es que CI, CD y el desarrollo
-local compartan idioma.
+La org está en **inglés** (`en_US`). Verificado con
+`SELECT LanguageLocaleKey FROM Organization` en el Dev Hub y en Portafolio.
 
-### Translation Workbench (pendiente de verificar)
+**Las scratch orgs no nacen en inglés por defecto.** La primera scratch org
+(2026-10-02), creada sin la clave `language` en `config/project-scratch-def.json`,
+nació en `es` (locale `es_PE`), aunque el Dev Hub y Portafolio estaban en `en_US`. Se
+fijó `"language": "en_US"` en el archivo y se recreó la org: tanto la org como el
+usuario administrador quedaron en `en_US`, y el Record Type maestro pasó de llamarse
+"Principal" a `Master`.
+
+El `locale` sigue siendo `es_PE`, como en el Dev Hub y en Portafolio; solo el idioma
+cambia. Como CI usa el mismo archivo, sus scratch orgs temporales también nacen en
+`en_US`, igual que CD en Portafolio y el desarrollo local.
+
+### Translation Workbench
 
 Translation Workbench es la herramienta de Setup que permite ofrecer traducciones de
 elementos de metadata, entre ellos los valores de picklist, según el idioma del
@@ -103,13 +114,33 @@ usuario. En este proyecto se usa **solo para los valores de picklist** (`Status`
 `Type`, `Reason` y los de campos custom); los labels se teclean directo en español y
 no la necesitan.
 
-> ⚠️ **Pendiente de verificar.** Aún no se ha comprobado que funcione como se espera.
-> Prueba mínima antes de aplicarlo a todo: crear UN valor de prueba en `Type`,
-> confirmar que se guarda en inglés, y confirmar que la traducción aparece al cambiar
-> el idioma del usuario a español. En la misma prueba, comprobar si el valor de
-> picklist tiene **API name propio** además de su label: de eso depende si el guion
-> bajo de valores como `Waiting_on_Customer` va solo en el API name o en todo el
-> valor. Si la prueba falla, esta sección y la regla de idioma se revisan.
+**Verificado el 2026-10-02** en la scratch org `req-case-01`:
+
+- Se tradujo al español un valor de prueba de `Type`. Al cambiar el idioma del usuario
+  a español y crear un Caso, ese valor (y solo ese) apareció traducido.
+- En `Status`, el diálogo de Setup tiene **campos separados para el label y el API
+  name**, y el API name va siempre en inglés.
+
+**Forma final de los valores de picklist** (decidida el 2026-10-02):
+
+| Parte                     | Regla                  | Ejemplo               |
+| ------------------------- | ---------------------- | --------------------- |
+| API name                  | Inglés, con guion bajo | `Waiting_on_Customer` |
+| Label maestro (org en_US) | Inglés, con espacios   | Waiting on Customer   |
+| Traducción al español     | Translation Workbench  | Esperando al Cliente  |
+
+El guion bajo vive solo en el API name. La regla vale para todos los valores de varias
+palabras (`Warranty_Claim`, `Construction_Defect`, `Lost_Ticket`...), no solo para
+`Waiting_on_Customer`. Por confirmar al configurar el primer valor de `Type` y de
+`Reason`: que sus diálogos también separen label y API name, como el de `Status`.
+
+> ⚠️ **Consecuencias para CI y CD (por verificar).** Las traducciones viajan como
+> metadata: en la scratch org ya aparecen como `StandardValueSetTranslation` y
+> `Translations`. Se espera que desplegarlas exija Translation Workbench activado en
+> la org de destino, es decir, en las scratch orgs de CI (hay que encontrar el ajuste
+> adecuado para `config/project-scratch-def.json`) y en Portafolio (activarlo a mano
+> en Setup antes del primer despliegue con traducciones). No está comprobado: se
+> verificará con el primer despliegue real a una scratch org limpia.
 
 > ⚠️ **Dos convenciones del BRD original quedaron derogadas:** proponía commits en
 > español (ahora inglés, por consistencia con el historial del repo) y nombraba campos

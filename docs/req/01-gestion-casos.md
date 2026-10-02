@@ -50,7 +50,7 @@ exclusivos de `Real_Estate` (`Warranty_Claim`, `Post_Sale_Follow_Up`).
 por ahora la dependencia Type→Reason. Agregar valores después es barato. Tres valores
 por unidad, decididos el 2026-09-23:
 
-| Record Type   | Valor guardado         | Traducción al español   |
+| Record Type   | API name               | Traducción al español   |
 | ------------- | ---------------------- | ----------------------- |
 | `Real_Estate` | `Delivery`             | Entrega                 |
 | `Real_Estate` | `Documentation`        | Documentación           |
@@ -62,8 +62,10 @@ por unidad, decididos el 2026-09-23:
 | `Hospitality` | `Operational_Incident` | _(por definir)_         |
 | `Hospitality` | `Service_Quality`      | Calidad del servicio    |
 
-Las traducciones que faltan se definen al configurar cada valor. La forma final de los
-valores con guion bajo depende de la verificación del API name (ver más abajo).
+Las traducciones que faltan se definen al configurar cada valor. **Forma de cada
+valor:** API name en inglés con guion bajo (`Construction_Defect`), label maestro en
+inglés con espacios ("Construction Defect") y la traducción al español de la tabla.
+Ver [Translation Workbench](../01-convenciones.md#translation-workbench).
 
 **Acceso a los Record Types.** Un solo Permission Set, `Case_All_Record_Types`, que da
 acceso a los tres Record Types al administrador y al desarrollo. Se crea en Setup y se
@@ -76,9 +78,9 @@ asignación de layout a cada Record Type se guarda en el perfil, no en el permis
 set, así que un layout por unidad volvería a meter el perfil (y su ruido) en el repo.
 Se crean layouts por unidad solo cuando un requerimiento lo exija.
 
-**Idioma.** Los valores de picklist se guardan en inglés y el español va como
-traducción vía Translation Workbench (pendiente de verificar). Los labels de los
-Record Types se teclean directo en español. Ver
+**Idioma.** Los valores de picklist llevan API name y label maestro en inglés, y el
+español va como traducción vía Translation Workbench (verificado el 2026-10-02). Los
+labels de los Record Types se teclean directo en español. Ver
 [Idioma — regla estricta](../01-convenciones.md#idioma--regla-estricta).
 
 **Decisiones de diseño abiertas: ninguna.** Solo quedan las comprobaciones en la
@@ -97,17 +99,34 @@ commiteado):
 La asignación es dato y no metadata, así que hay que repetirla en cada scratch org
 nueva.
 
-**Pendiente de verificar en la scratch org** (antes de configurar los `Status`):
+**Verificado en la primera scratch org (2026-10-02):**
 
-1. Que la scratch org traiga por defecto los `Status` `New`, `Working`, `Escalated` y
-   `Closed`. Es lo que devuelve el Dev Hub, pero falta comprobarlo en la scratch org.
-2. Cómo se asigna el _support process_ a los Record Types. El support process es lo que
-   define qué valores de `Status` están disponibles para cada Record Type.
-3. Si un valor de picklist tiene **API name propio** además de su label. Con eso se
-   decide si el guion bajo de `Waiting_on_Customer` va solo en el API name o en todo el
-   valor. El nombre está confirmado; lo que falta decidir es su forma. Esta comprobación
-   se hace junto con la prueba de
-   [Translation Workbench](../01-convenciones.md#translation-workbench-pendiente-de-verificar).
+1. La org nace en `en_US` solo si `config/project-scratch-def.json` define
+   `"language": "en_US"`; sin esa clave nace en `es`. Ver
+   [Idioma de la org](../01-convenciones.md#idioma-de-la-org).
+2. Trae por defecto los `Status` `New` (valor por defecto), `Working`, `Escalated` y
+   `Closed` (el único cerrado).
+3. **No trae ningún support process** y `Case` solo tiene el Record Type maestro
+   (`Master`). El support process es lo que define qué valores de `Status` ve cada
+   Record Type. Como los tres Record Types comparten el mismo flujo, hará falta uno
+   solo con los seis valores. Antes hay que añadir `Waiting_on_Customer` y `Resolved`
+   a la lista maestra de `Status`. _Cómo lo pide el asistente de Record Types está por
+   comprobar en Setup._
+4. **Translation Workbench funciona.** Se tradujo al español un valor de prueba de
+   `Type` y apareció traducido al cambiar el idioma del usuario. Ver
+   [Translation Workbench](../01-convenciones.md#translation-workbench).
+5. **En `Status`, Setup separa label y API name**, y el API name va siempre en inglés.
+   Con eso queda decidida la forma de `Waiting_on_Customer`: API name
+   `Waiting_on_Customer`, label "Waiting on Customer" y traducción "Esperando al
+   Cliente". La misma regla vale para todos los valores de varias palabras.
+
+**Pendiente de comprobar al configurar:**
+
+- Que los diálogos de `Type` y de `Reason` también separen label y API name, como el de
+  `Status` (solo se vio este último).
+- La prueba de Translation Workbench dejó una traducción de prueba en la org, que viaja
+  como metadata. Retirarla antes del primer `retrieve`, o confirmar que desaparece
+  junto con los valores de `Type` por defecto que este requerimiento reemplaza.
 
 **Preguntas que debes poder responder:**
 
