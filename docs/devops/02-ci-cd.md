@@ -65,6 +65,32 @@ Pasos de [`cd.yml`](../../.github/workflows/cd.yml):
 | Autenticación | Dev Hub (para _crear_ la scratch)    | Portafolio (para _desplegar_) |
 | Persiste algo | **No.** Valida y descarta.           | **Sí.** Acumula features.     |
 
+## Portafolio: lo que el CD no hace, y por qué
+
+El CD despliega **metadata**. Hay cuatro cosas en Portafolio que no lo son, o que no se
+lograron fijar como tal, y se hacen a mano **una sola vez**:
+
+| Paso                                                   | Cómo                                                                                           | Por qué no está en el CD                                                        |
+| ------------------------------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Asignar el permission set a quien use los Record Types | `sf org assign permset -n Case_All_Record_Types -o habitat-porfolio`                           | Ver abajo                                                                       |
+| Activar Translation Workbench                          | Setup → Translation Language Settings → **Enable**                                             | No se logró fijar de forma fiable como metadata                                 |
+| Añadir el español como idioma activo                   | El mismo sitio → **Add** → Spanish → **Active**                                                | Igual que el anterior                                                           |
+| Volver a desplegar para activar las traducciones       | `gh run rerun $(gh run list --workflow CD --limit 1 --json databaseId --jq '.[0].databaseId')` | Las traducciones desplegadas con Translation Workbench apagado quedan inactivas |
+
+El último paso solo hace falta si las traducciones se desplegaron **antes** de activar
+Translation Workbench. Con la org ya configurada, cada CD las aplica directamente.
+
+### Por qué el CD no asigna el permission set
+
+- **Es un dato, no metadata**, y apunta a un usuario concreto. En el CD solo existe el
+  usuario de la integración (el del JWT), que no tiene por qué ser quien use la org.
+- **No es idempotente.** Asignarlo dos veces falla con `Duplicate PermissionSetAssignment`
+  (código de salida 1), y el CD corre en cada push a `main` sobre la misma org. Habría que
+  tolerar ese error a mano para algo que se hace una sola vez.
+- **No es lo habitual en orgs persistentes.** Las asignaciones las gestionan los
+  administradores o el aprovisionamiento de usuarios. En pipelines se asigna en scratch
+  orgs efímeras, como hace el CI, porque ahí se parte de cero cada vez.
+
 ## Dos workarounds de bugs del CLI
 
 Ambos están comentados en el propio YAML. Vale la pena entenderlos: son exactamente

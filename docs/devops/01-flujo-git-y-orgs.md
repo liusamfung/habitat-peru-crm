@@ -48,37 +48,48 @@ mergeado el PR — no se "sube" a ningún lado, es descartable por diseño.
 
 Un Dev Hub de Developer Edition da:
 
-- **3 scratch orgs activas** a la vez
-- **6 creaciones exitosas por día** (ventana móvil de 24 h)
+- **5 scratch orgs activas** a la vez
+- **10 creaciones por día** (ventana móvil de 24 h)
 
-**Cada corrida de CI consume una creación.** Con 6 al día, entre tus scratch orgs
-locales y los pushes a un PR abierto, se agota antes de lo que parece.
+Son los valores medidos en este Dev Hub con `sf limits api display`; ojo, no coinciden
+con los que da por supuestos el BRD original.
+
+**Cada corrida de CI consume una creación.** Con 10 al día, entre tus scratch orgs
+locales y los pushes a un PR abierto, conviene vigilarlo.
 
 ```bash
 sf org list --all                      # ver las activas
+sf limits api display -o habitat-devhub # ActiveScratchOrgs y DailyScratchOrgs restantes
 sf org delete scratch -o <alias> -p    # borrar una
 ```
 
+Un `sf org delete scratch` correcto **no imprime nada**: comprueba con `sf org list
+--all` que la org desapareció.
+
 ## Checklist de configuración inicial
 
-| #   | Paso                                                                                                                                       | Estado           |
-| --- | ------------------------------------------------------------------------------------------------------------------------------------------ | ---------------- |
-| 1   | Certificado JWT (`openssl req -x509 -newkey rsa:2048 -keyout server.key -out server.crt -days 3650 -nodes`), fuera del repo o gitignoreado | ✅               |
-| 2   | External Client App en el Dev Hub → Consumer Key                                                                                           | ✅               |
-| 3   | External Client App en Portafolio (mismo certificado) → su propio Consumer Key                                                             | ✅               |
-| 4   | GitHub Secrets configurados                                                                                                                | ✅               |
-| 5   | Workflows `ci.yml` y `cd.yml` commiteados y corriendo al menos una vez                                                                     | ✅               |
-| 6   | **Branch protection en `main`**                                                                                                            | ⬜ **Pendiente** |
-| 7   | Vigilar la cuota de scratch orgs                                                                                                           | 🔁 Continuo      |
+| #   | Paso                                                                                                                                       | Estado      |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------ | ----------- |
+| 1   | Certificado JWT (`openssl req -x509 -newkey rsa:2048 -keyout server.key -out server.crt -days 3650 -nodes`), fuera del repo o gitignoreado | ✅          |
+| 2   | External Client App en el Dev Hub → Consumer Key                                                                                           | ✅          |
+| 3   | External Client App en Portafolio (mismo certificado) → su propio Consumer Key                                                             | ✅          |
+| 4   | GitHub Secrets configurados                                                                                                                | ✅          |
+| 5   | Workflows `ci.yml` y `cd.yml` commiteados y corriendo al menos una vez                                                                     | ✅          |
+| 6   | **Branch protection en `main`** (ruleset `protect-main`)                                                                                   | ✅          |
+| 7   | Vigilar la cuota de scratch orgs                                                                                                           | 🔁 Continuo |
 
-### Paso 6 — Branch protection (pendiente)
+### Paso 6 — Branch protection (hecho)
 
-GitHub → Settings → Branches → Add rule, sobre `main`:
+Está configurada como un **ruleset** de GitHub llamado `protect-main`, sin ningún bypass,
+y no como la regla clásica de Settings → Branches. Ojo: por eso
+`gh api repos/<repo>/branches/main/protection` responde 404 aunque `main` esté protegido;
+hay que mirar `gh api repos/<repo>/rulesets`.
 
-- **"Require a pull request before merging"** — se puede activar desde ya.
-- **"Require status checks to pass"** — solo aparece seleccionable **después de que
-  `ci.yml` haya corrido al menos una vez** contra el repo; GitHub necesita haber
-  "visto" el check antes de poder exigirlo. Como el workflow ya corrió, este paso ya
-  se puede completar.
+El ruleset exige, sobre la rama por defecto:
 
-Con esto, el botón de "Merge" literalmente no se habilita si los tests Apex fallan.
+- **Pull request** antes de mergear (sin aprobaciones obligatorias, es un proyecto individual).
+- Los checks **`scratch-org-test`** y **`format-lint-lwc-tests`** en verde.
+- Sin borrado de la rama ni force-push.
+
+Con esto, el botón de "Merge" literalmente no se habilita si los tests Apex o el
+análisis estático fallan.

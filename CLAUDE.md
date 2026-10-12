@@ -124,5 +124,11 @@ Detalle y motivos en [docs/01-convenciones.md](docs/01-convenciones.md#idioma--r
 - ✅ Análisis estático de Apex (Salesforce Code Analyzer) en pre-push y en CI.
   `npm run scan` para correrlo a mano; `npm run scan:detail` explica cada violación.
   Ver [docs/devops/04-calidad-de-codigo.md](docs/devops/04-calidad-de-codigo.md).
-- ⬜ Ningún requerimiento de negocio implementado todavía. La única clase Apex
-  (`CicdPipelineCheck`) es un smoke test del pipeline, descartable.
+- ✅ **REQ-CASE-01** (Record Types por unidad de negocio, `Status`/`Type`/`Reason`,
+  permission set `Case_All_Record_Types`, traducciones al español), desplegado en
+  Portafolio. Ver [docs/req/01-gestion-casos.md](docs/req/01-gestion-casos.md).
+- ⬜ El resto de requerimientos. La única clase Apex (`CicdPipelineCheck`) es un smoke
+  test del pipeline, descartable cuando exista el primer Apex real.
+- ⚠️ En Portafolio hay pasos manuales que el CD no hace (asignar el permission set,
+  activar Translation Workbench y el español). Ver
+  [docs/devops/02-ci-cd.md](docs/devops/02-ci-cd.md#portafolio-lo-que-el-cd-no-hace-y-por-qué).
