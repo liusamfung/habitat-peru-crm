@@ -31,8 +31,10 @@ org**.
 3. `sf org login sfdx-url` → alias `devhub`, marcado como default Dev Hub.
 4. `sf org create scratch` → alias `scratch-org`, 1 día de duración.
 5. `sf project deploy start`.
-6. `sf apex run test -c -r human -w 20`.
-7. `sf org delete scratch` (`if: always()`).
+6. `sf org assign permset -n Case_All_Record_Types`: da acceso a los Record Types de
+   `Case`. Es un dato y no metadata, por eso no viaja en el despliegue.
+7. `sf apex run test -c -r human -w 20`.
+8. `sf org delete scratch` (`if: always()`).
 
 ### Por qué `if: always()` en el borrado
 
