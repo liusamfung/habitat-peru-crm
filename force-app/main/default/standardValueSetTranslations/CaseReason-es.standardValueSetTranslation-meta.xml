@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StandardValueSetTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <valueTranslation>
+        <masterLabel>Construction Defect</masterLabel>
+        <translation>Defecto de construcción</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Delivery</masterLabel>
+        <translation>Entrega</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Documentation</masterLabel>
+        <translation>Documentación</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Lost Ticket</masterLabel>
+        <translation>Pérdida de boleta</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Monthly Subscription</masterLabel>
+        <translation>Abono mensual</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Operational Incident</masterLabel>
+        <translation>Incidencia operativa</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Service Quality</masterLabel>
+        <translation>Calidad del servicio</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Special Request</masterLabel>
+        <translation>Solicitud especial</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Vehicle Damage</masterLabel>
+        <translation>Daño vehicular</translation>
+    </valueTranslation>
+</StandardValueSetTranslation>

@@ -31,6 +31,8 @@ git checkout -b feature/req-case-05
 sf org create scratch -f config/project-scratch-def.json -a scratch-case-05 -d -y 7
 # ...desarrollas...
 sf project deploy start -o scratch-case-05
+# la asignación de un permission set es dato, no metadata: repetirla en cada scratch org
+sf org assign permset -n Case_All_Record_Types -o scratch-case-05
 sf apex run test -o scratch-case-05 -l RunLocalTests -r human
 # si tocaste algo a mano en el navegador de la scratch org:
 sf project retrieve start -o scratch-case-05

@@ -103,6 +103,12 @@ jobs:
       - name: "Push source to scratch org"
         run: sf project deploy start
 
+      # Assign the permission set that makes the Case record types available.
+      # An assignment is data, not metadata, so it is never part of the deploy
+      # and has to be repeated on every new scratch org.
+      - name: "Assign permission set to default user"
+        run: sf org assign permset -n Case_All_Record_Types
+
       # Run Apex tests in scratch org
       - name: "Run Apex tests"
         run: sf apex run test -c -r human -w 20

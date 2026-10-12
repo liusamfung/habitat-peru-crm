@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StandardValueSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sorted>false</sorted>
+    <standardValue>
+        <fullName>Delivery</fullName>
+        <default>false</default>
+        <label>Delivery</label>
+        <cssExposed>false</cssExposed>
+    </standardValue>
+    <standardValue>
+        <fullName>Documentation</fullName>
+        <default>false</default>
+        <label>Documentation</label>
+        <cssExposed>false</cssExposed>
+    </standardValue>
+    <standardValue>
+        <fullName>Construction_Defect</fullName>
+        <default>false</default>
+        <label>Construction Defect</label>
+        <cssExposed>false</cssExposed>
+    </standardValue>
+    <standardValue>
+        <fullName>Lost_Ticket</fullName>
+        <default>false</default>
+        <label>Lost Ticket</label>
+        <cssExposed>false</cssExposed>
+    </standardValue>
+    <standardValue>
+        <fullName>Monthly_Subscription</fullName>
+        <default>false</default>
+        <label>Monthly Subscription</label>
+        <cssExposed>false</cssExposed>
+    </standardValue>
+    <standardValue>
+        <fullName>Vehicle_Damage</fullName>
+        <default>false</default>
+        <label>Vehicle Damage</label>
+        <cssExposed>false</cssExposed>
+    </standardValue>
+    <standardValue>
+        <fullName>Special_Request</fullName>
+        <default>false</default>
+        <label>Special Request</label>
+        <cssExposed>false</cssExposed>
+    </standardValue>
+    <standardValue>
+        <fullName>Operational_Incident</fullName>
+        <default>false</default>
+        <label>Operational Incident</label>
+        <cssExposed>false</cssExposed>
+    </standardValue>
+    <standardValue>
+        <fullName>Service_Quality</fullName>
+        <default>false</default>
+        <label>Service Quality</label>
+        <cssExposed>false</cssExposed>
+    </standardValue>
+</StandardValueSet>

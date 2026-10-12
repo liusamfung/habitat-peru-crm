@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<StandardValueSetTranslation xmlns="http://soap.sforce.com/2006/04/metadata">
+    <valueTranslation>
+        <masterLabel>Complaint</masterLabel>
+        <translation>Reclamo</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Inquiry</masterLabel>
+        <translation>Consulta</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Post Sale Follow Up</masterLabel>
+        <translation>Seguimiento posventa</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Request</masterLabel>
+        <translation>Solicitud</translation>
+    </valueTranslation>
+    <valueTranslation>
+        <masterLabel>Warranty Claim</masterLabel>
+        <translation>Reclamo de garantía</translation>
+    </valueTranslation>
+</StandardValueSetTranslation>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description
+  >Grants access to the Real_Estate, Parking and Hospitality Case record types</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>Todos los Record Types de Case</label>
+    <recordTypeVisibilities>
+        <recordType>Case.Hospitality</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>Case.Parking</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+    <recordTypeVisibilities>
+        <recordType>Case.Real_Estate</recordType>
+        <visible>true</visible>
+    </recordTypeVisibilities>
+</PermissionSet>

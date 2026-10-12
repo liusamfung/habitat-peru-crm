@@ -55,11 +55,11 @@ por unidad, decididos el 2026-09-23:
 | `Real_Estate` | `Delivery`             | Entrega                 |
 | `Real_Estate` | `Documentation`        | Documentación           |
 | `Real_Estate` | `Construction_Defect`  | Defecto de construcción |
-| `Parking`     | `Lost_Ticket`          | _(por definir)_         |
-| `Parking`     | `Monthly_Subscription` | _(por definir)_         |
-| `Parking`     | `Vehicle_Damage`       | _(por definir)_         |
-| `Hospitality` | `Special_Request`      | _(por definir)_         |
-| `Hospitality` | `Operational_Incident` | _(por definir)_         |
+| `Parking`     | `Lost_Ticket`          | Pérdida de boleta       |
+| `Parking`     | `Monthly_Subscription` | Abono mensual           |
+| `Parking`     | `Vehicle_Damage`       | Daño vehicular          |
+| `Hospitality` | `Special_Request`      | Solicitud especial      |
+| `Hospitality` | `Operational_Incident` | Incidencia operativa    |
 | `Hospitality` | `Service_Quality`      | Calidad del servicio    |
 
 Las traducciones que faltan se definen al configurar cada valor. **Forma de cada
@@ -88,16 +88,12 @@ scratch org y el trabajo posterior que se indica abajo. Los `Reason` de Parking 
 la pérdida de boleta ([REQ-PK-01](07-parking.md)), el abono mensual (REQ-PK-02) y el
 daño vehicular ([REQ-PK-03](07-parking.md)).
 
-**Cuando el permission set ya exista en el repo** (creado, traído con `retrieve` y
-commiteado):
-
-- Añadir `sf org assign permset -n Case_All_Record_Types` a `ci.yml`, **después del
-  deploy y antes de los tests**.
-- Añadirlo también al flujo local de creación de scratch orgs (ver el
-  [flujo por feature](../devops/01-flujo-git-y-orgs.md)).
-
-La asignación es dato y no metadata, así que hay que repetirla en cada scratch org
-nueva.
+**Asignación del permission set.** `ci.yml` ejecuta
+`sf org assign permset -n Case_All_Record_Types` **después del deploy y antes de los
+tests**, y el [flujo por feature](../devops/01-flujo-git-y-orgs.md) local también lo
+incluye. Se comprobó el 2026-10-11 en una scratch org limpia: tras asignarlo, los tres
+Record Types quedan disponibles para el usuario. La asignación es dato y no metadata, así
+que hay que repetirla en cada scratch org nueva.
 
 **Verificado en la primera scratch org (2026-10-02):**
 
@@ -120,13 +116,8 @@ nueva.
    `Waiting_on_Customer`, label "Waiting on Customer" y traducción "Esperando al
    Cliente". La misma regla vale para todos los valores de varias palabras.
 
-**Pendiente de comprobar al configurar:**
-
-- Que los diálogos de `Type` y de `Reason` también separen label y API name, como el de
-  `Status` (solo se vio este último).
-- La prueba de Translation Workbench dejó una traducción de prueba en la org, que viaja
-  como metadata. Retirarla antes del primer `retrieve`, o confirmar que desaparece
-  junto con los valores de `Type` por defecto que este requerimiento reemplaza.
+**Comprobado al configurar:** las listas de `Type` y de `Reason` también separan label y
+API name, como `Status`.
 
 **Preguntas que debes poder responder:**
 
