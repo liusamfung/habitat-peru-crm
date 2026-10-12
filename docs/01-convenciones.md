@@ -134,13 +134,22 @@ palabras (`Warranty_Claim`, `Construction_Defect`, `Lost_Ticket`...), no solo pa
 `Waiting_on_Customer`. Por confirmar al configurar el primer valor de `Type` y de
 `Reason`: que sus diálogos también separen label y API name, como el de `Status`.
 
-> ⚠️ **Consecuencias para CI y CD (por verificar).** Las traducciones viajan como
-> metadata: en la scratch org ya aparecen como `StandardValueSetTranslation` y
-> `Translations`. Se espera que desplegarlas exija Translation Workbench activado en
-> la org de destino, es decir, en las scratch orgs de CI (hay que encontrar el ajuste
-> adecuado para `config/project-scratch-def.json`) y en Portafolio (activarlo a mano
-> en Setup antes del primer despliegue con traducciones). No está comprobado: se
-> verificará con el primer despliegue real a una scratch org limpia.
+**Consecuencias para CI y CD (verificado el 2026-10-11 en scratch orgs limpias).** Las
+traducciones viajan como metadata (`StandardValueSetTranslation`, un archivo por campo).
+
+- **Desplegarlas no falla** aunque Translation Workbench esté desactivado: el despliegue
+  completo de `force-app` terminó sin errores. Por eso el CI no necesita ningún ajuste
+  en `config/project-scratch-def.json` para pasar.
+- **Sin Translation Workbench y sin el español habilitado, quedan inactivas:** existen
+  como metadata pero no tienen efecto.
+- **Activar solo `languageSettings.enableTranslationWorkbench` en la definición** (el
+  CLI lo acepta) **no basta** con un único despliegue. En la prueba, las traducciones
+  pasaron a estar activas tras activar Translation Workbench, desplegar el componente
+  `Translations: es` y volver a desplegar las tres traducciones; no se aisló cuál de
+  esos pasos es el imprescindible.
+- **Decisión:** no se añade el ajuste a la definición, porque no cambia el resultado
+  del CI. En Portafolio y en cualquier scratch org de demostración, activar Translation
+  Workbench y añadir el español a mano en Setup, una sola vez.
 
 > ⚠️ **Dos convenciones del BRD original quedaron derogadas:** proponía commits en
 > español (ahora inglés, por consistencia con el historial del repo) y nombraba campos
