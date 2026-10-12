@@ -25,7 +25,7 @@
 
 | ID          | Tipo                 | Prio  | Estado | Resumen                                                         |
 | ----------- | -------------------- | ----- | ------ | --------------------------------------------------------------- |
-| REQ-CASE-01 | DEC                  | Alta  | ⬜     | Crear Caso multi-canal con Record Type por Unidad de Negocio    |
+| REQ-CASE-01 | DEC                  | Alta  | ✅     | Crear Caso multi-canal con Record Type por Unidad de Negocio    |
 | REQ-CASE-02 | FLOW / IA            | Media | ⬜     | Sugerir Tipo, Motivo y Prioridad según datos de origen          |
 | REQ-CASE-03 | DEC                  | Alta  | ⬜     | Asignar Caso a la Queue de su Unidad y sub-proceso              |
 | REQ-CASE-04 | DEC                  | Alta  | ⬜     | Evitar Casos duplicados al responder correo de Caso existente   |

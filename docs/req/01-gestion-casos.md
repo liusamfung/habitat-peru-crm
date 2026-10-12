@@ -5,7 +5,7 @@ todo lo demás se apoya en cómo quede modelado el objeto `Case`.
 
 | ID          | Tipo            | Prioridad | Estado |
 | ----------- | --------------- | --------- | ------ |
-| REQ-CASE-01 | DEC             | Alta      | ⬜     |
+| REQ-CASE-01 | DEC             | Alta      | ✅     |
 | REQ-CASE-02 | FLOW / IA       | Media     | ⬜     |
 | REQ-CASE-03 | DEC             | Alta      | ⬜     |
 | REQ-CASE-04 | DEC             | Alta      | ⬜     |
