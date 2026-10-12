@@ -71,19 +71,19 @@
 
 ### Valores de `Status` mencionados en el tablero
 
-El tablero usa los nombres que ve el usuario, en español. Los **valores guardados** de
-`Status` van en inglés, porque el código los compara como string (ver
+El tablero usa los nombres que ve el usuario, en español. El **API name** de cada valor
+de `Status` va en inglés, porque es lo que compara el código (ver
 [Idioma — regla estricta](../01-convenciones.md#idioma--regla-estricta)):
 
-| Nombre visible       | Valor guardado        | Estado                       |
+| Nombre visible       | API name              | Estado                       |
 | -------------------- | --------------------- | ---------------------------- |
 | Resuelto             | `Resolved`            | Decidido. Estado **abierto** |
 | Cerrado              | `Closed`              | Decidido. Estado **cerrado** |
 | Esperando al Cliente | `Waiting_on_Customer` | Decidido. Estado **abierto** |
 
-El nombre `Waiting_on_Customer` está confirmado. Falta verificar en la scratch org si el
-guion bajo va solo en el API name o en todo el valor (ver las
-[decisiones de REQ-CASE-01](01-gestion-casos.md#decisiones-de-diseño-2026-09-23)).
+El guion bajo vive solo en el API name: el label maestro es "Waiting on Customer" y
+"Esperando al Cliente" es su traducción (ver
+[Translation Workbench](../01-convenciones.md#translation-workbench)).
 
 ## Orden de ataque sugerido
 
