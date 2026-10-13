@@ -60,7 +60,7 @@
 | REQ-RPT-01  | DEC                  | Alta  | ⬜     | Dashboard consolidado Holding (AHT, FCR, CSAT, SLA)             |
 | REQ-RPT-02  | DEC                  | Media | ⬜     | Restringir reportes por línea de negocio                        |
 | REQ-RPT-03  | DEC                  | Baja  | ⬜     | Tiempo de primera respuesta vía `MessagingSessionMetrics`       |
-| REQ-SEC-01  | DEC                  | Alta  | ⬜     | OWD de Case Privado + Case Team + jerarquía acotada             |
+| REQ-SEC-01  | DEC                  | Alta  | ✅     | OWD de Case Privado + Case Team + jerarquía acotada             |
 | REQ-SEC-02  | DEC                  | Alta  | ⬜     | Ley 29733 — campos sensibles vía FLS                            |
 | REQ-SEC-03  | DEC                  | Media | ⬜     | Field History Tracking en campos con implicancia legal          |
 | REQ-INT-01  | **INT**              | Media | ⬜     | Endpoint REST para crear Casos desde PMS de hotel               |

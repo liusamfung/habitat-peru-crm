@@ -127,6 +127,11 @@ Detalle y motivos en [docs/01-convenciones.md](docs/01-convenciones.md#idioma--r
 - ✅ **REQ-CASE-01** (Record Types por unidad de negocio, `Status`/`Type`/`Reason`,
   permission set `Case_All_Record_Types`, traducciones al español), desplegado en
   Portafolio. Ver [docs/req/01-gestion-casos.md](docs/req/01-gestion-casos.md).
+- ✅ **REQ-SEC-01** (OWD de `Case` privado, 7 roles por unidad de negocio, una sharing
+  rule de lectura por unidad, permission sets `Case_Real_Estate`/`Case_Parking`/
+  `Case_Hospitality`, vista `All_Cases`). Verificado con un usuario de prueba. Los Case
+  Team Roles son datos, no metadata: se crean cuando un requerimiento los pida. Ver
+  [docs/req/10-seguridad.md](docs/req/10-seguridad.md).
 - ⬜ El resto de requerimientos. La única clase Apex (`CicdPipelineCheck`) es un smoke
   test del pipeline, descartable cuando exista el primer Apex real.
 - ⚠️ En Portafolio hay pasos manuales que el CD no hace (asignar el permission set,

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<SharingRules xmlns="http://soap.sforce.com/2006/04/metadata">
+    <sharingCriteriaRules>
+        <fullName>Hospitality_Agents_Read</fullName>
+        <accessLevel>Read</accessLevel>
+        <label>Hotelería: lectura para agentes</label>
+        <sharedTo>
+            <role>Hospitality_Agent</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Hotelería</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Parking_Agents_Read</fullName>
+        <accessLevel>Read</accessLevel>
+        <label>Estacionamientos: lectura para agentes</label>
+        <sharedTo>
+            <role>Parking_Agent</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Estacionamientos</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+    <sharingCriteriaRules>
+        <fullName>Real_Estate_Agents_Read</fullName>
+        <accessLevel>Read</accessLevel>
+        <label>Inmobiliaria: lectura para agentes</label>
+        <sharedTo>
+            <role>Real_Estate_Agent</role>
+        </sharedTo>
+        <criteriaItems>
+            <field>RecordTypeId</field>
+            <operation>equals</operation>
+            <value>Inmobiliaria</value>
+        </criteriaItems>
+        <includeRecordsOwnedByAll>true</includeRecordsOwnedByAll>
+    </sharingCriteriaRules>
+</SharingRules>
