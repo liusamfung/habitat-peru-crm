@@ -1,57 +1,169 @@
-# Salesforce DX Project
+# Habitat Perú CRM
 
-Salesforce DX is a development approach that brings source-driven development, team collaboration, and continuous integration to the Salesforce Platform. Instead of working directly in an org through a web browser, you work with metadata as source files in a local DX project, track changes in version control, and deploy through automated processes.
+[![CI](https://github.com/liusamfung/habitat-peru-crm/actions/workflows/ci.yml/badge.svg)](https://github.com/liusamfung/habitat-peru-crm/actions/workflows/ci.yml)
+[![CD](https://github.com/liusamfung/habitat-peru-crm/actions/workflows/cd.yml/badge.svg)](https://github.com/liusamfung/habitat-peru-crm/actions/workflows/cd.yml)
 
-This project template gets you started with the tools and structure you need to build Salesforce applications using source control, scratch orgs, and the Salesforce CLI.
+> **EN:** A Salesforce Service Cloud pilot for a fictional Peruvian holding with three
+> business units (real estate, parking, hospitality) that share a single `Case` object
+> through Record Types. It is a personal portfolio project: source-driven development with
+> Salesforce DX, a private sharing model verified per role, and a CI/CD pipeline on GitHub
+> Actions (static analysis, ephemeral scratch orgs, JWT deploy to a portfolio org).
+> Documentation is written in Spanish; code, branches and commits are in English.
 
-## Prerequisites
+Piloto de **Salesforce Service Cloud** para "Corporación Habitat Perú", un holding
+**ficticio** con tres unidades de negocio que comparten el objeto `Case` mediante Record
+Types:
 
-Before you start, make sure you have:
+- **Habitat Inmobiliaria**: lotes, vivienda social, departamentos, posventa y garantías.
+- **Habitat Parking**: playas de estacionamiento.
+- **Habitat Hospitality**: hoteles.
 
-- **Salesforce CLI** - Download from [developer.salesforce.com/tools/salesforcecli](https://developer.salesforce.com/tools/salesforcecli). See [Install Salesforce CLI](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_install_cli.htm) for details.
-- **VS Code with Salesforce Extension Pack** - See [Installation Instructions](https://developer.salesforce.com/docs/platform/sfvscode-extensions/guide/install.html) for details. Includes the Agentforce Vibes extension.
-- **A development org** - Sign up for a free Developer Edition org [here](https://developer.salesforce.com/signup).
-- **Dev Hub enabled** (optional, required to create scratch orgs) - You can enable Dev Hub in your development org under Setup > Dev Hub. See [Provide Developers Access to Salesforce DX Tools](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_setup_dx_tools.htm).
+Es un proyecto de práctica para portafolio de Salesforce Developer: unos 43 requerimientos
+de negocio, la mayoría declarativos, y un subconjunto en Apex, LWC e integraciones.
 
-## Project Structure
+## Estado
 
-Your DX project follows this structure:
+| Área                                                                             | Estado |
+| -------------------------------------------------------------------------------- | ------ |
+| Pipeline CI/CD, análisis estático y hooks de Git                                 | ✅     |
+| **REQ-CASE-01**: Record Types por unidad, `Status`/`Type`/`Reason`, traducciones | ✅     |
+| **REQ-SEC-01**: OWD privado de `Case`, jerarquía de roles, sharing rules         | ✅     |
+| Resto de requerimientos (colas, SLA, Apex, LWC, integraciones…)                  | ⬜     |
 
-- **`force-app/main/default/`** - Your metadata source files live in this default package directory. You can configure additional package directories in the `sfdx-project.json` file.
-- **`config/`** - Scratch org definitions and project settings
-- **`scripts/`** - Automation scripts for common tasks
-- **`sfdx-project.json`** - Project manifest that defines package directories, namespace, API version, and other project-level settings
+El tablero completo, con el estado de cada requerimiento, está en
+[docs/req/README.md](docs/req/README.md).
 
-See [Salesforce DX Project Configuration](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_ws_config.htm).
+> Hasta ahora el repositorio contiene metadata declarativa e infraestructura. La única
+> clase Apex (`CicdPipelineCheck`) es un smoke test del pipeline; el primer Apex real
+> llega con REQ-CASE-05.
 
-## Get Started
+## Qué hay construido
 
-Ready to start developing? The [Get Started with Salesforce DX](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/sfdx_dev_get_started_dx.htm) guide walks you through your first project, from creating a scratch org to creating a simple Apex class or LWC to deploying your code to a sandbox.
+### Gestión de casos (REQ-CASE-01)
 
-## Common Salesforce CLI Commands
+Un único objeto `Case` con tres Record Types (`Real_Estate`, `Parking`, `Hospitality`),
+un Business Process compartido y un solo layout. Los valores de `Status`, `Type` y `Reason`
+son en inglés (el código compara el API name) y se muestran en español con Translation
+Workbench. Detalle y decisiones en [docs/req/01-gestion-casos.md](docs/req/01-gestion-casos.md).
 
-Here are common CLI commands that you'll use the most:
+### Modelo de visibilidad (REQ-SEC-01)
 
-- `sf org login web`: Authorize an org
-- `sf org open`: Open your org in a browser
-- `sf org create scratch`: Create a scratch org
-- `sf project deploy start`: Deploy metadata to your org
-- `sf project retrieve start`: Retrieve metadata from your org
-- `sf template generate <artifact>`: Scaffold new components, such as Apex classes and triggers, LWC components, Lightning apps, and more
-- `sf apex <command>`: Run Apex tests, run anonymous Apex blocks, and view logs
-- `sf data <command>`: Work with test data
-- `sf alias <command>`: Manage org aliases
-- `sf config <command>`: Configure CLI settings
+El OWD de `Case` es **privado**. La visibilidad por unidad se logra con la **forma de la
+jerarquía de roles**, no con una casilla (en `Case` "Grant Access Using Hierarchies" no se
+puede desmarcar):
 
-## Use Agentforce Vibes to Build Lightning Apps
+```
+Holding
+├── Real_Estate_Manager   └── Real_Estate_Agent
+├── Parking_Manager       └── Parking_Agent
+└── Hospitality_Manager   └── Hospitality_Agent
+```
 
-Transform your ideas into custom Lightning apps that extend CRM workflows directly in Lightning Experience. Through natural conversations with Agentforce Vibes, implement custom objects and fields, complex business logic, and dynamic UI components. See [Build a Lightning App Using Agentforce Vibes](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/lexapp-overview.html).
+| Rol     | Casos propios     | Casos de pares de su unidad | Otras unidades |
+| ------- | ----------------- | --------------------------- | -------------- |
+| Agente  | Lectura y edición | Solo lectura                | No             |
+| Gerente | Lectura y edición | Todos los de su unidad      | No             |
+| Holding | Todos             | Todos                       | Todos          |
 
-## Additional Resources
+El "solo lectura entre pares" lo da una **sharing rule por criterio por unidad**, y cada
+unidad tiene su permission set que solo habilita los Record Types propios. El modelo se
+verificó con un usuario no administrador (el administrador ve todo) cambiando su rol.
+Diseño completo en [docs/req/10-seguridad.md](docs/req/10-seguridad.md).
 
-- [Agentforce Vibes Developer Guide](https://developer.salesforce.com/docs/platform/einstein-for-devs/guide/einstein-overview.html)
-- [Salesforce CLI Installation Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_setup.meta/sfdx_setup/sfdx_setup_intro.htm)
-- [Salesforce DX Developer Guide](https://developer.salesforce.com/docs/atlas.en-us.sfdx_dev.meta/sfdx_dev/)
-- [Salesforce CLI Command Reference](https://developer.salesforce.com/docs/atlas.en-us.sfdx_cli_reference.meta/sfdx_cli_reference/)
-- [Salesforce CLI Plugin Development Guide](https://developer.salesforce.com/docs/platform/salesforce-cli-plugin/guide/conceptual-overview.html)
-- [Salesforce VS Code Extensions Documentation](https://developer.salesforce.com/tools/vscode/)
+## Ingeniería
+
+### Flujo de trabajo
+
+```mermaid
+flowchart LR
+    A[Rama feature] -->|push| B[Pull Request]
+    B --> C[CI: formato, lint, Jest, Code Analyzer]
+    C --> D[CI: scratch org efimera y tests Apex]
+    D -->|merge a main| E[CD: despliegue a org de Portafolio]
+```
+
+- **CI** en cada Pull Request, en dos jobs encadenados. El primero no usa ninguna org
+  (Prettier, ESLint, Jest y Salesforce Code Analyzer); el segundo crea una scratch org,
+  despliega, asigna el permission set, corre los tests Apex y la borra siempre.
+- **CD** en cada push a `main`: login JWT a la org de Portafolio, despliegue y tests.
+- Un **ruleset de GitHub** (`protect-main`) exige Pull Request y los dos checks en verde.
+- **Hooks de Git** (Husky): Prettier sobre lo staged al commitear y Code Analyzer al
+  hacer push.
+- Tres tipos de org: Dev Hub (solo presta scratch orgs), scratch orgs (una por feature) y
+  Portafolio (acumula lo mergeado).
+
+Decisiones y problemas reales documentados en [docs/devops/](docs/devops/): dos
+workarounds de bugs del Salesforce CLI, por qué el CD no asigna permission sets y cómo
+evitar que el _source tracking_ borre metadata de la org.
+
+### Convenciones
+
+| Ámbito                                   | Idioma                                                    |
+| ---------------------------------------- | --------------------------------------------------------- |
+| Ramas, commits, Pull Requests y código   | Inglés                                                    |
+| API names de objetos y campos custom     | Inglés                                                    |
+| Labels de objetos, campos y Record Types | Español                                                   |
+| Valores de picklist                      | Inglés, con traducción al español (Translation Workbench) |
+| Documentación (`docs/`, este README)     | Español                                                   |
+
+Las ramas siguen `tipo/kebab` (`feature/req-case-05`) y los commits de un requerimiento
+llevan su ID: `REQ-CASE-05: add satisfaction survey on case close`.
+
+## Cómo ejecutarlo
+
+Necesitas Node (versión en [.node-version](.node-version)), el
+[Salesforce CLI](https://developer.salesforce.com/tools/salesforcecli) y un **Dev Hub**
+autenticado.
+
+```bash
+npm ci
+sf plugins install code-analyzer
+```
+
+```bash
+sf org create scratch -f config/project-scratch-def.json -a habitat-scratch -d -y 7
+sf project deploy start -o habitat-scratch -d force-app
+sf org assign permset -n Case_All_Record_Types -o habitat-scratch
+sf apex run test -o habitat-scratch -l RunLocalTests -r human
+```
+
+La asignación de un permission set es un dato, no metadata, y por eso no viaja en el
+despliegue: hay que repetirla en cada scratch org.
+
+Calidad de código en local:
+
+```bash
+npm run prettier:verify
+npm run lint
+npm run test:unit
+npm run scan
+```
+
+## Estructura del repositorio
+
+```
+force-app/main/default/   metadata Salesforce (objetos, roles, sharing rules, permission sets, Apex…)
+config/                   definición de la scratch org
+docs/                     documentación en español
+  req/                    los 43 requerimientos, uno por área funcional
+  devops/                 flujo Git, orgs, CI/CD, autenticación JWT, calidad de código
+.github/workflows/        ci.yml y cd.yml
+scripts/                  utilidades
+```
+
+## Cómo se trabaja este proyecto
+
+El objetivo es **aprender construyendo**. El código de negocio (Apex, LWC, pruebas) lo
+escribe el autor; la IA se usa como tutor para explicar conceptos, revisar y depurar. La
+infraestructura (CI/CD, scripts) y la documentación sí se construyeron con su ayuda. Las
+reglas de colaboración están en [CLAUDE.md](CLAUDE.md).
+
+## Documentación
+
+| Archivo                                            | Contenido                                           |
+| -------------------------------------------------- | --------------------------------------------------- |
+| [docs/README.md](docs/README.md)                   | Índice maestro                                      |
+| [docs/00-contexto.md](docs/00-contexto.md)         | Contexto, alcance y stakeholders                    |
+| [docs/01-convenciones.md](docs/01-convenciones.md) | Tipos de implementación y requisitos no funcionales |
+| [docs/req/](docs/req/)                             | Requerimientos funcionales y su tablero             |
+| [docs/devops/](docs/devops/)                       | Git, orgs, CI/CD y calidad de código                |
