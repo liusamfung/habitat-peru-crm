@@ -101,10 +101,16 @@ la mayoría declarativos (DEC), un subconjunto en Apex/LWC/Integraciones.
 | **Valores de picklist** (`Status`, `Type`, `Reason`, campos custom) | **Inglés** (API name y label), con traducción al español vía Translation Workbench |
 | Plantillas de email y textos de Flow                                | **Pendiente de decidir**                                                           |
 | Documentación (`docs/`, `README.md`)                                | **Español**                                                                        |
-| **Conversación conmigo**                                            | **Español**                                                                        |
+| **Chat con Claude** (solo la conversación)                          | **Inglés** (desde 2026-10-24)                                                      |
 
 La documentación va en español porque es lo que revisará un reclutador
 hispanohablante; el código va en inglés porque es el estándar profesional.
+
+El chat va en inglés porque Samuel practica el idioma; lo pide su `~/.claude/CLAUDE.md`
+personal, que además fija las correcciones al final de cada respuesta. Eso afecta **solo
+a la conversación**: todo lo que se entrega sigue esta tabla. Si ese archivo personal
+pide otro idioma para un entregable (por ejemplo, commits en español), **manda esta
+tabla, ítem por ítem**.
 
 La org está en **inglés** (`en_US`). Los valores de picklist llevan API name y label
 maestro en inglés: el código compara el API name (`Status = 'Closed'`) y el español se
