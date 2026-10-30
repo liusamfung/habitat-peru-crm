@@ -27,7 +27,7 @@
 | ----------- | -------------------- | ----- | ------ | --------------------------------------------------------------- |
 | REQ-CASE-01 | DEC                  | Alta  | ✅     | Crear Caso multi-canal con Record Type por Unidad de Negocio    |
 | REQ-CASE-02 | FLOW / IA            | Media | ⬜     | Sugerir Tipo, Motivo y Prioridad según datos de origen          |
-| REQ-CASE-03 | DEC                  | Alta  | ⬜     | Asignar Caso a la Queue de su Unidad y sub-proceso              |
+| REQ-CASE-03 | DEC                  | Alta  | ✅     | Asignar Caso a la Queue de su Unidad y sub-proceso              |
 | REQ-CASE-04 | DEC                  | Alta  | ⬜     | Evitar Casos duplicados al responder correo de Caso existente   |
 | REQ-CASE-05 | **APEX**             | Media | ⬜     | Encuesta de satisfacción asíncrona al cerrar Caso               |
 | REQ-CASE-06 | FLOW + Approval      | Alta  | ⬜     | Bloquear cierre de Caso de garantía sin evidencia ni aprobación |

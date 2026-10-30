@@ -101,10 +101,16 @@ la mayoría declarativos (DEC), un subconjunto en Apex/LWC/Integraciones.
 | **Valores de picklist** (`Status`, `Type`, `Reason`, campos custom) | **Inglés** (API name y label), con traducción al español vía Translation Workbench |
 | Plantillas de email y textos de Flow                                | **Pendiente de decidir**                                                           |
 | Documentación (`docs/`, `README.md`)                                | **Español**                                                                        |
-| **Conversación conmigo**                                            | **Español**                                                                        |
+| **Chat con Claude** (solo la conversación)                          | **Inglés** (desde 2026-10-24)                                                      |
 
 La documentación va en español porque es lo que revisará un reclutador
 hispanohablante; el código va en inglés porque es el estándar profesional.
+
+El chat va en inglés porque Samuel practica el idioma; lo pide su `~/.claude/CLAUDE.md`
+personal, que además fija las correcciones al final de cada respuesta. Eso afecta **solo
+a la conversación**: todo lo que se entrega sigue esta tabla. Si ese archivo personal
+pide otro idioma para un entregable (por ejemplo, commits en español), **manda esta
+tabla, ítem por ítem**.
 
 La org está en **inglés** (`en_US`). Los valores de picklist llevan API name y label
 maestro en inglés: el código compara el API name (`Status = 'Closed'`) y el español se
@@ -132,6 +138,9 @@ Detalle y motivos en [docs/01-convenciones.md](docs/01-convenciones.md#idioma--r
   `Case_Hospitality`, vista `All_Cases`). Verificado con un usuario de prueba. Los Case
   Team Roles son datos, no metadata: se crean cuando un requerimiento los pida. Ver
   [docs/req/10-seguridad.md](docs/req/10-seguridad.md).
+- ✅ **REQ-CASE-03** (9 colas por sub-proceso y la regla de asignación `Case Routing`, de 9
+  entradas, activa). Los miembros de cada cola son el rol agente de la unidad. Verificado
+  en una scratch org. Ver [docs/req/01-gestion-casos.md](docs/req/01-gestion-casos.md).
 - ⬜ El resto de requerimientos. La única clase Apex (`CicdPipelineCheck`) es un smoke
   test del pipeline, descartable cuando exista el primer Apex real.
 - ⚠️ En Portafolio hay pasos manuales que el CD no hace (asignar el permission set,

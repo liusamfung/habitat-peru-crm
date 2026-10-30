@@ -7,7 +7,7 @@ todo lo demás se apoya en cómo quede modelado el objeto `Case`.
 | ----------- | --------------- | --------- | ------ |
 | REQ-CASE-01 | DEC             | Alta      | ✅     |
 | REQ-CASE-02 | FLOW / IA       | Media     | ⬜     |
-| REQ-CASE-03 | DEC             | Alta      | ⬜     |
+| REQ-CASE-03 | DEC             | Alta      | ✅     |
 | REQ-CASE-04 | DEC             | Alta      | ⬜     |
 | REQ-CASE-05 | APEX            | Media     | ⬜     |
 | REQ-CASE-06 | FLOW + Approval | Alta      | ⬜     |
@@ -151,6 +151,96 @@ justificarlo — es parte del ejercicio.
 **Pasos de Setup:** crea las Queues (una por sub-proceso), luego Assignment Rules
 con entradas ordenadas por Record Type / Origen → Queue correspondiente. No requiere
 Apex.
+
+### Decisiones de diseño (2026-10-13)
+
+> Los sub-procesos de cada unidad **no vienen del BRD**: son una propuesta de diseño
+> generada en otra sesión y aceptada por Samuel, que todavía no conoce a fondo el negocio.
+> Los nombres de las colas son revisables; lo estructural (una cola por sub-proceso, una
+> sola regla de asignación, el Record Type decide la unidad) es lo que se mantiene.
+
+**Colas** (9). API name en inglés, label en español. La cola general de cada unidad es su
+mesa de partes y recibe lo que no cae en una específica.
+
+| Unidad       | API name                      | Label                                  | Qué atiende                                              |
+| ------------ | ----------------------------- | -------------------------------------- | -------------------------------------------------------- |
+| Inmobiliaria | `Real_Estate_Warranty`        | Inmobiliaria - Garantías               | `Type = Warranty_Claim` o `Reason = Construction_Defect` |
+| Inmobiliaria | `Real_Estate_After_Sales`     | Inmobiliaria - Posventa                | `Type = Post_Sale_Follow_Up` o `Reason = Delivery`       |
+| Inmobiliaria | `Real_Estate_Front_Office`    | Inmobiliaria - Mesa de partes          | `Documentation` y todo lo demás de la unidad             |
+| Parking      | `Parking_Claims`              | Estacionamientos - Siniestros          | `Reason = Vehicle_Damage`                                |
+| Parking      | `Parking_Customer_Service`    | Estacionamientos - Atención al cliente | `Lost_Ticket`, `Monthly_Subscription` y el resto         |
+| Hotelería    | `Hospitality_Operations`      | Hotelería - Operaciones                | `Reason = Operational_Incident`                          |
+| Hotelería    | `Hospitality_Guest_Relations` | Hotelería - Atención al huésped        | `Reason = Service_Quality` o `Type = Complaint`          |
+| Hotelería    | `Hospitality_Front_Desk`      | Hotelería - Recepción                  | `Special_Request` y el resto                             |
+| Transversal  | `Unclassified`                | Sin clasificar                         | Sin Record Type o sin coincidencia                       |
+
+**Assignment Rule.** Una sola activa sobre `Case`. Se evalúa de arriba a abajo y gana la
+primera entrada que coincide:
+
+| #   | Criterio                                                                   | Cola                          |
+| --- | -------------------------------------------------------------------------- | ----------------------------- |
+| 1   | `Real_Estate` y (`Type = Warranty_Claim` o `Reason = Construction_Defect`) | `Real_Estate_Warranty`        |
+| 2   | `Real_Estate` y (`Type = Post_Sale_Follow_Up` o `Reason = Delivery`)       | `Real_Estate_After_Sales`     |
+| 3   | `Real_Estate`                                                              | `Real_Estate_Front_Office`    |
+| 4   | `Parking` y `Reason = Vehicle_Damage`                                      | `Parking_Claims`              |
+| 5   | `Parking`                                                                  | `Parking_Customer_Service`    |
+| 6   | `Hospitality` y `Reason = Operational_Incident`                            | `Hospitality_Operations`      |
+| 7   | `Hospitality` y (`Reason = Service_Quality` o `Type = Complaint`)          | `Hospitality_Guest_Relations` |
+| 8   | `Hospitality`                                                              | `Hospitality_Front_Desk`      |
+| 9   | Sin criterio                                                               | `Unclassified`                |
+
+| Decisión              | Valor                                                                                  |
+| --------------------- | -------------------------------------------------------------------------------------- |
+| Qué decide la cola    | El Record Type decide la unidad; `Reason` (y a veces `Type`) decide el sub-proceso     |
+| `Origin`              | **No entra.** Es tema de REQ-CH (Omni-Channel y Skills)                                |
+| Miembros              | El rol `*_Agent` de cada unidad en todas sus colas; el rol `Holding` en `Unclassified` |
+| Public Groups         | Ninguno por ahora: hay un solo nivel de agente por unidad                              |
+| Caso sin coincidencia | La entrada 9 lo manda a `Unclassified`, para no depender del _Default Case Owner_      |
+
+**Efecto sobre REQ-SEC-01.** Un Caso propiedad de una cola lo pueden **editar** sus
+miembros: la regla "los pares solo leen" aplica a Casos propiedad de un _usuario_. Al
+tomarlo (volverse propietario), los demás pasan a solo lectura.
+
+**Revisado contra el repo (2026-10-13).** Todos los valores de `Type` y `Reason` que usa la
+tabla existen y están habilitados en el Record Type que les corresponde. Una asimetría que
+conviene tener presente: `Type = Complaint` solo enruta en Hotelería; una queja de
+Inmobiliaria o de Parking cae en su mesa de partes o atención al cliente.
+
+**Resultado de la verificación (2026-10-30).** En la scratch org, con el administrador y con
+el usuario de prueba `Agente Prueba` (rol `Parking_Agent`):
+
+- **Cada entrada enruta a la cola esperada.** Se creó al menos un Caso por entrada (menos la
+  9, ver abajo) con la casilla "Assign using active assignment rule" marcada.
+- **Gana la primera coincidencia.** Un Caso de Hotelería con `Type = Complaint` y
+  `Reason = Operational_Incident` cumple las entradas 6 y 7 y fue a `Hospitality_Operations`
+  (entrada 6). Cambiar el orden de esas dos entradas cambiaría el resultado: el orden es
+  una decisión de negocio.
+- **Sin la casilla, la regla no corre.** El Caso queda con el creador como propietario.
+- **La casilla sí aparece** al crear un Caso a mano en Lightning.
+- **Una entrada sin criterio es válida** (entrada 9): Salesforce la acepta y se recupera con
+  `retrieve`. No se pudo probar su efecto, porque el diálogo de Nuevo Caso solo ofrece los
+  tres Record Types.
+- **Visibilidad de colas.** `Agente Prueba` ve y puede editar un Caso propiedad de la cola de
+  Parking, y no ve los Casos de las colas de Inmobiliaria ni de Hotelería.
+- **Los Casos anteriores no se reasignan:** la regla actúa al crear (o al guardar con la
+  casilla), no es un proceso por lotes.
+- **Los criterios guardan el API name de los valores de picklist** (`Warranty_Claim`) aunque
+  se elijan por etiqueta en pantalla; el Record Type se guarda por **etiqueta**
+  (`Inmobiliaria`), igual que en la sharing rule.
+- **Las colas y la regla se recuperan con `retrieve`** (`-m Queue -m AssignmentRules:Case`).
+  Los miembros por rol viajan dentro del archivo de cada cola.
+
+**Un error detectado al revisar.** Dos entradas se habían creado con la cola equivocada: la
+5 apuntaba a `Parking_Claims` y la 8 a `Real_Estate_Front_Office`. La segunda era grave:
+los Casos de Hotelería habrían caído en una cola de Inmobiliaria, visible para sus agentes,
+y se habría roto el aislamiento de REQ-SEC-01. Se encontró **leyendo la regla desde la
+org** (no a ojo en la pantalla) y se corrigió antes de probar.
+
+**Sin verificar todavía:**
+
+- Que la regla y las colas se desplieguen bien en una org limpia, en especial el criterio
+  por etiqueta del Record Type (lo cubre el CI del PR).
+- Qué hace la entrada 9 con un Caso sin Record Type (hace falta crearlo por API).
 
 **Preguntas que debes poder responder:**
 
