@@ -138,6 +138,9 @@ Detalle y motivos en [docs/01-convenciones.md](docs/01-convenciones.md#idioma--r
   `Case_Hospitality`, vista `All_Cases`). Verificado con un usuario de prueba. Los Case
   Team Roles son datos, no metadata: se crean cuando un requerimiento los pida. Ver
   [docs/req/10-seguridad.md](docs/req/10-seguridad.md).
+- ✅ **REQ-CASE-03** (9 colas por sub-proceso y la regla de asignación `Case Routing`, de 9
+  entradas, activa). Los miembros de cada cola son el rol agente de la unidad. Verificado
+  en una scratch org. Ver [docs/req/01-gestion-casos.md](docs/req/01-gestion-casos.md).
 - ⬜ El resto de requerimientos. La única clase Apex (`CicdPipelineCheck`) es un smoke
   test del pipeline, descartable cuando exista el primer Apex real.
 - ⚠️ En Portafolio hay pasos manuales que el CD no hace (asignar el permission set,

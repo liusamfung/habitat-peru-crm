@@ -7,7 +7,7 @@ todo lo demás se apoya en cómo quede modelado el objeto `Case`.
 | ----------- | --------------- | --------- | ------ |
 | REQ-CASE-01 | DEC             | Alta      | ✅     |
 | REQ-CASE-02 | FLOW / IA       | Media     | ⬜     |
-| REQ-CASE-03 | DEC             | Alta      | ⬜     |
+| REQ-CASE-03 | DEC             | Alta      | ✅     |
 | REQ-CASE-04 | DEC             | Alta      | ⬜     |
 | REQ-CASE-05 | APEX            | Media     | ⬜     |
 | REQ-CASE-06 | FLOW + Approval | Alta      | ⬜     |
@@ -206,14 +206,41 @@ tabla existen y están habilitados en el Record Type que les corresponde. Una as
 conviene tener presente: `Type = Complaint` solo enruta en Hotelería; una queja de
 Inmobiliaria o de Parking cae en su mesa de partes o atención al cliente.
 
-**Por verificar en una org limpia:**
+**Resultado de la verificación (2026-10-30).** En la scratch org, con el administrador y con
+el usuario de prueba `Agente Prueba` (rol `Parking_Agent`):
 
-- Que los criterios por Record Type de la regla sobrevivan al despliegue (en la sharing rule
-  de REQ-SEC-01 el `<value>` guardaba la etiqueta).
-- Si una entrada **sin criterio** es válida como "catch-all" (entrada 9).
-- Si crear un Caso a mano ejecuta la regla o hay que marcar "Assign using active
-  assignment rule", y si esa casilla aparece en el layout de Lightning.
-- Que las colas y la regla se recuperen con `retrieve` (`Queue`, `AssignmentRules`).
+- **Cada entrada enruta a la cola esperada.** Se creó al menos un Caso por entrada (menos la
+  9, ver abajo) con la casilla "Assign using active assignment rule" marcada.
+- **Gana la primera coincidencia.** Un Caso de Hotelería con `Type = Complaint` y
+  `Reason = Operational_Incident` cumple las entradas 6 y 7 y fue a `Hospitality_Operations`
+  (entrada 6). Cambiar el orden de esas dos entradas cambiaría el resultado: el orden es
+  una decisión de negocio.
+- **Sin la casilla, la regla no corre.** El Caso queda con el creador como propietario.
+- **La casilla sí aparece** al crear un Caso a mano en Lightning.
+- **Una entrada sin criterio es válida** (entrada 9): Salesforce la acepta y se recupera con
+  `retrieve`. No se pudo probar su efecto, porque el diálogo de Nuevo Caso solo ofrece los
+  tres Record Types.
+- **Visibilidad de colas.** `Agente Prueba` ve y puede editar un Caso propiedad de la cola de
+  Parking, y no ve los Casos de las colas de Inmobiliaria ni de Hotelería.
+- **Los Casos anteriores no se reasignan:** la regla actúa al crear (o al guardar con la
+  casilla), no es un proceso por lotes.
+- **Los criterios guardan el API name de los valores de picklist** (`Warranty_Claim`) aunque
+  se elijan por etiqueta en pantalla; el Record Type se guarda por **etiqueta**
+  (`Inmobiliaria`), igual que en la sharing rule.
+- **Las colas y la regla se recuperan con `retrieve`** (`-m Queue -m AssignmentRules:Case`).
+  Los miembros por rol viajan dentro del archivo de cada cola.
+
+**Un error detectado al revisar.** Dos entradas se habían creado con la cola equivocada: la
+5 apuntaba a `Parking_Claims` y la 8 a `Real_Estate_Front_Office`. La segunda era grave:
+los Casos de Hotelería habrían caído en una cola de Inmobiliaria, visible para sus agentes,
+y se habría roto el aislamiento de REQ-SEC-01. Se encontró **leyendo la regla desde la
+org** (no a ojo en la pantalla) y se corrigió antes de probar.
+
+**Sin verificar todavía:**
+
+- Que la regla y las colas se desplieguen bien en una org limpia, en especial el criterio
+  por etiqueta del Record Type (lo cubre el CI del PR).
+- Qué hace la entrada 9 con un Caso sin Record Type (hace falta crearlo por API).
 
 **Preguntas que debes poder responder:**
 
